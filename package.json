@@ -1,0 +1,42 @@
+{
+  "name": "coreui-chart",
+  "version": "1.0.0",
+  "description": "CoreUI Chart",
+  "scripts": {
+    "build_all": "gulp build_dependents && gulp build_js && gulp build_css",
+    "build_watch": "gulp build_watch",
+    "build_dependents": "gulp build_dependents",
+    "text_js": "eslint -c .eslintrc.json --max-warnings 100 --ext .js ./src/js"
+  },
+  "dependencies": {
+    "google-palette": "1.1.1",
+    "apexcharts": "3.41.0"
+  },
+  "devDependencies": {
+    "gulp": "4.*",
+    "gulp-concat": "2.*",
+    "gulp-sourcemaps": "3.*",
+    "gulp-uglify": "3.0.*",
+    "gulp-clean-css": "4.*",
+    "gulp-rename": "2.0.0",
+    "gulp-wrap-file": "0.1.2",
+    "eslint": "8.36.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shabuninil/coreui-chart.git"
+  },
+  "keywords": [
+    "js",
+    "frontend",
+    "framework",
+    "chart",
+    "bootstrap"
+  ],
+  "author": "shabuninil",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shabuninil/coreui-chart/issues"
+  },
+  "homepage": "https://github.com/shabuninil/coreui-chart"
+}
