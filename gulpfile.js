@@ -51,7 +51,7 @@ var conf = {
         }
     },
     css: {
-        file: 'coreui-panel.min.css',
+        file: 'coreui-chart.min.css',
         src: [
             'src/css/coreui.chart.css'
         ]
