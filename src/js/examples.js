@@ -552,11 +552,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 labelColor: '#ffffff',
                 startAngle: -120,  // -360 - 360
                 endAngle: 120,     // -360 - 360
-                size: 10,          // 0 - 100
+                size: 45,          // 0 - 100
                 fill: 100,         // 0 - 100
+                trackBackground: '#f2f2f2',
+                shadowOpacity: 0,
                 total: {
                     label: 'Всего',
+                    labelSize: '14px',
+                    valueSize: '18px',
                     color: '#333',
+                    offsetY: 0,
                     formatter: function (data) {
                         return data.reduce(function (a, b) { return a + b; });
                     },
