@@ -46,12 +46,14 @@ CoreUI.chart.type.pie = {
      */
     _buildApexOptions: function () {
 
-        let that        = this;
-        let type        = 'pie';
-        let style       = {};
-        let fillType    = 'solid';
-        let fillOpacity = 0.9;
-        let labelColor = '#fff';
+        let that            = this;
+        let type            = 'pie';
+        let style           = {};
+        let fillType        = 'solid';
+        let fillOpacity     = 0.9;
+        let shadowOpacity   = 0;
+        let labelColor      = '#fff';
+        let trackBackground = '#f2f2f2';
 
         this._apexOptions.colors     = Object.values(this._colors);
         this._apexOptions.chart.type = 'pie';
@@ -122,11 +124,16 @@ CoreUI.chart.type.pie = {
                 style.size = 100;
             }
 
-            this._apexOptions.plotOptions.pie.donut.size = style.size + '%';
+            this._apexOptions.plotOptions.pie.donut.size        = style.size + '%';
+            this._apexOptions.plotOptions.radialBar.hollow.size = style.size + '%';
         }
 
         if (style.hasOwnProperty('labelColor') && typeof style.labelColor === 'string') {
             labelColor = style.labelColor;
+        }
+
+        if (style.hasOwnProperty('trackBackground') && typeof style.trackBackground === 'string') {
+            trackBackground = style.trackBackground;
         }
 
         if (style.hasOwnProperty('gradient') && style.gradient === true) {
@@ -145,6 +152,16 @@ CoreUI.chart.type.pie = {
             }
 
             fillOpacity = style.fill / 100
+        }
+
+        if (style.hasOwnProperty('shadowOpacity') && typeof style.shadowOpacity === 'number') {
+            if (style.shadowOpacity < 0) {
+                style.shadowOpacity = 0;
+            } else if (style.shadowOpacity > 1) {
+                style.shadowOpacity = 1;
+            }
+
+            shadowOpacity = style.shadowOpacity;
         }
 
         // Total
@@ -190,6 +207,19 @@ CoreUI.chart.type.pie = {
                 this._apexOptions.plotOptions.radialBar.dataLabels.total.show  = true;
                 this._apexOptions.plotOptions.radialBar.dataLabels.total.label = style.total.label;
 
+                if (style.total.hasOwnProperty('labelSize') && typeof style.total.labelSize === 'string') {
+                    this._apexOptions.plotOptions.radialBar.dataLabels.total.fontSize = style.total.labelSize;
+                }
+
+                if (style.total.hasOwnProperty('valueSize') && typeof style.total.valueSize === 'string') {
+                    this._apexOptions.plotOptions.radialBar.dataLabels.value.fontSize = style.total.valueSize;
+                }
+
+                if (style.total.hasOwnProperty('offsetY') && typeof style.total.offsetY === 'number') {
+                    this._apexOptions.plotOptions.radialBar.dataLabels.name.offsetY  = style.total.offsetY - 10;
+                    this._apexOptions.plotOptions.radialBar.dataLabels.value.offsetY = style.total.offsetY;
+                }
+
                 if (style.total.hasOwnProperty('color') && typeof style.total.color === 'string') {
                     this._apexOptions.plotOptions.radialBar.dataLabels.total.color = style.total.color;
                     this._apexOptions.plotOptions.radialBar.dataLabels.value.color = style.total.color;
@@ -214,9 +244,18 @@ CoreUI.chart.type.pie = {
             }
         }
 
+        if (type === 'radialBar') {
+            this._apexOptions.plotOptions.radialBar.track.background = trackBackground;
+
+            if (shadowOpacity > 0) {
+                this._apexOptions.plotOptions.radialBar.track.dropShadow.enabled = true;
+                this._apexOptions.plotOptions.radialBar.track.dropShadow.opacity = shadowOpacity;
+            }
+        }
+
         this._apexOptions.fill.type                 = fillType;
         this._apexOptions.fill.gradient.opacityFrom = fillOpacity;
-        this._apexOptions.fill.gradient.opacityTo   = 1;
+        this._apexOptions.fill.gradient.opacityTo   = 0;
         this._apexOptions.fill.opacity              = fillOpacity;
 
         this._apexOptions.dataLabels.style.colors = [labelColor];

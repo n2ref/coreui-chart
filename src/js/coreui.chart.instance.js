@@ -641,13 +641,28 @@ CoreUI.chart.instance = {
                 radialBar: {
                     startAngle: 0,
                     endAngle: 360,
-                    donut: {
-                        size: '65%',
+                    hollow: {
+                        size: '40%'
+                    },
+                    track: {
+                        show: true,
+                        background: '#f2f2f2',
+                        dropShadow: {
+                            enabled: false,
+                            top: 0,
+                            left: 0,
+                            blur: 3,
+                            opacity: 0.15
+                        }
                     },
                     dataLabels: {
+                        name: {
+                            offsetY: undefined,
+                        },
                         value: {
                             show: false,
                             fontSize: '22px',
+                            offsetY: undefined,
                         },
                         total: {
                             show: false,
