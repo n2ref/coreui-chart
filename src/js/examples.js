@@ -1323,7 +1323,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             theme: {
                 mode: 'dark',                  // light, dark
-                colorScheme: 'monochrome',     // mpn65, classic, monochrome // http://google.github.io/palette.js/
+                colorScheme: 'monochrome',     // classic, mpn65, monochrome, custom // http://google.github.io/palette.js/
+                customColors: [ '#ef9a9a', '#ce93d8', '#c6f990' ],
                 monochromeColor: '#278aee',
                 background: null,              // #fff
             },
