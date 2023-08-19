@@ -112,15 +112,35 @@ CoreUI.chart.instance = {
 
             let apexOptions = {};
 
-            if (this._options.hasOwnProperty('custom') && CoreUI.chart.utils.isObject(custom)) {
+            if (this._options.hasOwnProperty('custom') && CoreUI.chart.utils.isObject(this._options.custom)) {
                 apexOptions = this._options.custom;
             } else {
                 apexOptions = this._convertToApex(this._options);
             }
 
+            let colorScheme  = 'classic';
+            let schemeColors = [];
+
+            if (this._options.options.hasOwnProperty('theme') &&
+                CoreUI.chart.utils.isObject(this._options.options.theme) &&
+                this._options.options.theme.hasOwnProperty('colorScheme') &&
+                typeof this._options.options.theme.colorScheme === 'string'
+            ) {
+                colorScheme = this._options.options.theme.colorScheme;
+            }
+
+            if (colorScheme === 'custom' &&
+                this._options.options.theme.hasOwnProperty('customColors') &&
+                Array.isArray(this._options.options.theme.customColors)
+            ) {
+                schemeColors = this._options.options.theme.customColors;
+            } else {
+                schemeColors = this._getColors(colorScheme);
+            }
+
 
             this._typeInstance = $.extend(true, {}, CoreUI.chart.type[type]);
-            this._typeInstance.init(this._options, apexOptions, this._getColors());
+            this._typeInstance.init(this._options, apexOptions, schemeColors);
 
             this._apex = this._typeInstance.render(this._container);
 
@@ -939,34 +959,34 @@ CoreUI.chart.instance = {
 
     /**
      * Получение набора цветов
+     * @param {string} colorScheme
      * @private
      */
-    _getColors: function () {
+    _getColors: function (colorScheme) {
 
-        let colorScheme = 'classic';
-        let colors      = null;
+        let colors = null;
+
+        colorScheme = colorScheme || 'classic';
 
         // Получение цветов палитры
-        if (colorScheme) {
-            if (colorScheme === 'classic') {
-                colors = CoreUI.chart.utils.getPaletteClassic();
+        if (colorScheme === 'classic') {
+            colors = CoreUI.chart.utils.getPaletteClassic();
 
-            } else {
-                colors = CoreUI.chart.palette(colorScheme, 65);
+        } else {
+            colors = CoreUI.chart.palette(colorScheme, 65);
 
-                // не удалось получить столько цветов
-                if (colors === null) {
-                    $.each(CoreUI.chart.palette.listSchemes('all'), function (key, scheme) {
-                        if (scheme.scheme_name === colorScheme) {
-                            colors = CoreUI.chart.palette(colorScheme, scheme.max);
-                            return false;
-                        }
-                    });
-
-                    // Некорректная схема
-                    if (colors === null) {
-                        colors = CoreUI.chart.utils.getPaletteClassic();
+            // не удалось получить столько цветов
+            if (colors === null) {
+                $.each(CoreUI.chart.palette.listSchemes('all'), function (key, scheme) {
+                    if (scheme.scheme_name === colorScheme) {
+                        colors = CoreUI.chart.palette(colorScheme, scheme.max);
+                        return false;
                     }
+                });
+
+                // Некорректная схема
+                if (colors === null) {
+                    colors = CoreUI.chart.utils.getPaletteClassic();
                 }
             }
         }
