@@ -566,7 +566,7 @@ CoreUI.chart.instance = {
                 }
             },
             title: {
-                text: "",
+                text: undefined,
                 align: 'left',
                 style : {
                     fontSize  : '14px',
@@ -576,7 +576,7 @@ CoreUI.chart.instance = {
                 }
             },
             subtitle: {
-                text: "",
+                text: undefined,
                 align: 'left',
                 margin: 5,
                 style : {
