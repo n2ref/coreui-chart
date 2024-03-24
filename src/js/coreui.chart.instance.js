@@ -517,6 +517,9 @@ CoreUI.chart.instance = {
                 },
             },
             chart: {
+                sparkline: {
+                    enabled: false
+                },
                 zoom: {
                     enabled: false
                 },
@@ -1109,6 +1112,9 @@ CoreUI.chart.instance = {
         }
         if (enabled.hasOwnProperty('toolbar') && typeof enabled.toolbar === 'boolean') {
             apexOptions.chart.toolbar.show = enabled.toolbar;
+        }
+        if (enabled.hasOwnProperty('minimize') && typeof enabled.minimize === 'boolean') {
+            apexOptions.chart.sparkline.enabled = enabled.minimize;
         }
         if (enabled.hasOwnProperty('legend') && typeof enabled.legend === 'boolean') {
             apexOptions.legend.show = enabled.legend;
