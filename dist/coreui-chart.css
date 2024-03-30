@@ -1,3 +1,6 @@
+.apexcharts-tooltip {
+  width: max-content;
+}
 .apexcharts-tooltip.apexcharts-theme-light .apexcharts-tooltip-title {
   background-color: #FFF !important;
 }
