@@ -1,5 +1,9 @@
 
-CoreUI.chart.instance = {
+import coreuiChartUtils from './coreui.chart.utils';
+import coreuiChart      from './coreui.chart';
+import palette          from '../../node_modules/google-palette/palette';
+
+let coreuiChartInstance = {
 
     _options: {
         id: null,
@@ -35,12 +39,10 @@ CoreUI.chart.instance = {
      */
     _init: function (options) {
 
-        this._options.options.lang = CoreUI.chart.getSetting('lang');
-
         this._options = $.extend(true, {}, this._options, options);
 
         if ( ! this._options.id) {
-            this._options.id = CoreUI.chart.utils.hashCode();
+            this._options.id = coreuiChartUtils.hashCode();
         }
 
         this._options.datasets = typeof this._options.datasets === 'object' && Array.isArray(this._options.datasets)
@@ -105,14 +107,14 @@ CoreUI.chart.instance = {
         if (this._container) {
             let type = this._getTypeChart();
 
-            if ( ! CoreUI.chart.type.hasOwnProperty(type)) {
+            if ( ! coreuiChart.type.hasOwnProperty(type)) {
                 console.error('Chart type not found: ' + type);
                 return;
             }
 
             let apexOptions = {};
 
-            if (this._options.hasOwnProperty('custom') && CoreUI.chart.utils.isObject(this._options.custom)) {
+            if (this._options.hasOwnProperty('custom') && coreuiChartUtils.isObject(this._options.custom)) {
                 apexOptions = this._options.custom;
             } else {
                 apexOptions = this._convertToApex(this._options);
@@ -122,7 +124,7 @@ CoreUI.chart.instance = {
             let schemeColors = [];
 
             if (this._options.options.hasOwnProperty('theme') &&
-                CoreUI.chart.utils.isObject(this._options.options.theme) &&
+                coreuiChartUtils.isObject(this._options.options.theme) &&
                 this._options.options.theme.hasOwnProperty('colorScheme') &&
                 typeof this._options.options.theme.colorScheme === 'string'
             ) {
@@ -139,7 +141,7 @@ CoreUI.chart.instance = {
             }
 
 
-            this._typeInstance = $.extend(true, {}, CoreUI.chart.type[type]);
+            this._typeInstance = $.extend(true, {}, coreuiChart.type[type]);
             this._typeInstance.init(this._options, apexOptions, schemeColors);
 
             this._apex = this._typeInstance.render(this._container);
@@ -443,7 +445,7 @@ CoreUI.chart.instance = {
     destruct: function () {
 
         this._apex.destroy();
-        delete CoreUI.chart._instances[this.getId()];
+        delete coreuiChartUtils._instances[this.getId()];
     },
 
 
@@ -453,9 +455,9 @@ CoreUI.chart.instance = {
      */
     getLang: function () {
 
-        return CoreUI.chart.lang.hasOwnProperty(this._options.options.lang)
-            ? CoreUI.chart.lang[this._options.options.lang]
-            : CoreUI.chart.lang['en'];
+        return coreuiChart.lang.hasOwnProperty(this._options.options.lang)
+            ? coreuiChart.lang[this._options.options.lang]
+            : coreuiChart.lang['en'];
     },
 
 
@@ -724,14 +726,15 @@ CoreUI.chart.instance = {
                 x: {
                     formatter: function (val) {
                         if (typeof val === 'string') {
-                            return val;
+                           return val;
                         }
-
-                        return this.hasOwnProperty('categoryLabels') &&
-                               this.categoryLabels.hasOwnProperty(val-1) &&
-                               this.categoryLabels[val-1] !== undefined
-                            ? this.categoryLabels[val-1]
-                            : null;
+                        if (this) {
+                            return this.hasOwnProperty('categoryLabels') &&
+                            this.categoryLabels.hasOwnProperty(val - 1) &&
+                            this.categoryLabels[val - 1] !== undefined
+                                ? this.categoryLabels[val - 1]
+                                : null;
+                        }
                     }
                 },
                 y: {
@@ -836,10 +839,10 @@ CoreUI.chart.instance = {
         };
 
 
-        if (chart.hasOwnProperty('labels') && CoreUI.chart.utils.isArray(chart.labels)) {
+        if (chart.hasOwnProperty('labels') && coreuiChartUtils.isArray(chart.labels)) {
             apexOptions.labels = chart.labels;
         }
-        if (chart.hasOwnProperty('options') && CoreUI.chart.utils.isObject(chart.options)) {
+        if (chart.hasOwnProperty('options') && coreuiChartUtils.isObject(chart.options)) {
             if (chart.options.hasOwnProperty('lang')) {
                 apexOptions.chart.defaultLocale = chart.options.lang;
                 apexOptions.chart.locales       = [ {
@@ -855,38 +858,38 @@ CoreUI.chart.instance = {
             }
 
             // Title
-            if (chart.options.hasOwnProperty('title') && CoreUI.chart.utils.isObject(chart.options.title)) {
+            if (chart.options.hasOwnProperty('title') && coreuiChartUtils.isObject(chart.options.title)) {
                 that._setOptionsTitle(apexOptions, chart.options.title);
             }
 
             // Legend
-            if (chart.options.hasOwnProperty('legend') && CoreUI.chart.utils.isObject(chart.options.legend)) {
+            if (chart.options.hasOwnProperty('legend') && coreuiChartUtils.isObject(chart.options.legend)) {
                 let title = chart.options.hasOwnProperty('title') ? chart.options.title : {};
                 that._setOptionsLegend(apexOptions, chart.options.legend, title);
             }
 
             // Enabled
-            if (chart.options.hasOwnProperty('enabled') && CoreUI.chart.utils.isObject(chart.options.enabled)) {
+            if (chart.options.hasOwnProperty('enabled') && coreuiChartUtils.isObject(chart.options.enabled)) {
                 that._setOptionsEnabled(apexOptions, chart.options.enabled);
             }
 
             // Tooltip
-            if (chart.options.hasOwnProperty('tooltip') && CoreUI.chart.utils.isObject(chart.options.tooltip)) {
+            if (chart.options.hasOwnProperty('tooltip') && coreuiChartUtils.isObject(chart.options.tooltip)) {
                 that._setOptionsTooltip(apexOptions, chart.options.tooltip);
             }
 
             // Axis
-            if (chart.options.hasOwnProperty('axis') && CoreUI.chart.utils.isObject(chart.options.axis)) {
+            if (chart.options.hasOwnProperty('axis') && coreuiChartUtils.isObject(chart.options.axis)) {
                 that._setOptionsAxis(apexOptions, chart.options.axis);
             }
 
             // theme
-            if (chart.options.hasOwnProperty('theme') && CoreUI.chart.utils.isObject(chart.options.theme)) {
+            if (chart.options.hasOwnProperty('theme') && coreuiChartUtils.isObject(chart.options.theme)) {
                 that._setOptionsTheme(apexOptions, chart.options.theme);
             }
 
             // Events
-            if (chart.options.hasOwnProperty('events') && CoreUI.chart.utils.isObject(chart.options.events)) {
+            if (chart.options.hasOwnProperty('events') && coreuiChartUtils.isObject(chart.options.events)) {
                 if (chart.options.events.hasOwnProperty('markerClick')) {
                     if (typeof chart.options.events.markerClick === 'function') {
                         apexOptions.chart.events.markerClick = function(event, chartContext, marker) {
@@ -894,7 +897,7 @@ CoreUI.chart.instance = {
                         }
 
                     } else if (typeof chart.options.events.markerClick === 'string') {
-                        let func = CoreUI.chart.utils.getFunctionByName(chart.options.events.markerClick);
+                        let func = coreuiChartUtils.getFunctionByName(chart.options.events.markerClick);
                         if (typeof func === 'function') {
                             apexOptions.chart.events.markerClick = func;
                         }
@@ -908,7 +911,7 @@ CoreUI.chart.instance = {
                         }
 
                     } else if (typeof chart.options.events.legendClick === 'string') {
-                        let func = CoreUI.chart.utils.getFunctionByName(chart.options.events.legendClick);
+                        let func = coreuiChartUtils.getFunctionByName(chart.options.events.legendClick);
                         if (typeof func === 'function') {
                             apexOptions.chart.events.legendClick = func;
                         }
@@ -922,7 +925,7 @@ CoreUI.chart.instance = {
                         }
 
                     } else if (typeof chart.options.events.zoomed === 'string') {
-                        let func = CoreUI.chart.utils.getFunctionByName(chart.options.events.zoomed);
+                        let func = coreuiChartUtils.getFunctionByName(chart.options.events.zoomed);
                         if (typeof func === 'function') {
                             apexOptions.chart.events.zoomed = func;
                         }
@@ -944,7 +947,7 @@ CoreUI.chart.instance = {
     _getTypeChart: function () {
 
         let type = this._options.hasOwnProperty('options') &&
-                CoreUI.chart.utils.isObject(this._options.options) &&
+                coreuiChartUtils.isObject(this._options.options) &&
                 this._options.options.hasOwnProperty('type') &&
                 typeof this._options.options.type === 'string'
             ? this._options.options.type
@@ -973,23 +976,23 @@ CoreUI.chart.instance = {
 
         // Получение цветов палитры
         if (colorScheme === 'classic') {
-            colors = CoreUI.chart.utils.getPaletteClassic();
+            colors = coreuiChartUtils.getPaletteClassic();
 
         } else {
-            colors = CoreUI.chart.palette(colorScheme, 65);
+            colors = palette(colorScheme, 65);
 
             // не удалось получить столько цветов
             if (colors === null) {
-                $.each(CoreUI.chart.palette.listSchemes('all'), function (key, scheme) {
+                $.each(palette.listSchemes('all'), function (key, scheme) {
                     if (scheme.scheme_name === colorScheme) {
-                        colors = CoreUI.chart.palette(colorScheme, scheme.max);
+                        colors = palette(colorScheme, scheme.max);
                         return false;
                     }
                 });
 
                 // Некорректная схема
                 if (colors === null) {
-                    colors = CoreUI.chart.utils.getPaletteClassic();
+                    colors = coreuiChartUtils.getPaletteClassic();
                 }
             }
         }
@@ -1026,7 +1029,7 @@ CoreUI.chart.instance = {
         }
 
         // Description
-        if (title.hasOwnProperty('description') && CoreUI.chart.utils.isObject(title.description)) {
+        if (title.hasOwnProperty('description') && coreuiChartUtils.isObject(title.description)) {
             if (title.description.hasOwnProperty('text') && typeof title.description.text === 'string') {
                 apexOptions.subtitle.text = title.description.text;
             }
@@ -1065,7 +1068,7 @@ CoreUI.chart.instance = {
             apexOptions.legend.horizontalAlign = legend.horizontalAlign;
 
             if (['left', 'right'].indexOf(legend.position) >= 0 &&
-                CoreUI.chart.utils.isObject(title) &&
+                coreuiChartUtils.isObject(title) &&
                 (
                     (title.hasOwnProperty('text') && typeof title.text === 'string' && title.text) ||
                     (title.description.hasOwnProperty('text') && typeof title.description.text === 'string' && title.description.text)
@@ -1152,7 +1155,7 @@ CoreUI.chart.instance = {
                 apexOptions.tooltip.y.formatter = tooltip.formatter;
 
             } else if (typeof tooltip.formatter === 'string') {
-                let func = CoreUI.chart.utils.getFunctionByName(tooltip.formatter);
+                let func = coreuiChartUtils.getFunctionByName(tooltip.formatter);
                 if (typeof func === 'function') {
                     apexOptions.tooltip.y.formatter = func;
                 }
@@ -1187,7 +1190,7 @@ CoreUI.chart.instance = {
     _setOptionsAxis: function (apexOptions, axis) {
 
         // Xaxis
-        if (axis.hasOwnProperty('xaxis') && CoreUI.chart.utils.isObject(axis.xaxis)) {
+        if (axis.hasOwnProperty('xaxis') && coreuiChartUtils.isObject(axis.xaxis)) {
             if (axis.xaxis.hasOwnProperty('show') && typeof axis.xaxis.show === 'boolean') {
                 apexOptions.xaxis.show = axis.xaxis.show;
             }
@@ -1213,7 +1216,7 @@ CoreUI.chart.instance = {
         }
 
         // Yaxis
-        if (axis.hasOwnProperty('yaxis') && CoreUI.chart.utils.isObject(axis.yaxis)) {
+        if (axis.hasOwnProperty('yaxis') && coreuiChartUtils.isObject(axis.yaxis)) {
             if (axis.yaxis.hasOwnProperty('show') && typeof axis.xaxis.show === 'boolean') {
                 apexOptions.yaxis.show = axis.yaxis.show;
             }
@@ -1248,7 +1251,7 @@ CoreUI.chart.instance = {
         }
 
         // Grid
-        if (axis.hasOwnProperty('grid') && CoreUI.chart.utils.isObject(axis.grid)) {
+        if (axis.hasOwnProperty('grid') && coreuiChartUtils.isObject(axis.grid)) {
             if (axis.grid.hasOwnProperty('show') && typeof axis.grid.show === 'boolean') {
                 apexOptions.grid.show = axis.grid.show;
             }
@@ -1297,3 +1300,5 @@ CoreUI.chart.instance = {
         }
     }
 }
+
+export default coreuiChartInstance;

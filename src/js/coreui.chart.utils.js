@@ -1,5 +1,5 @@
 
-CoreUI.chart.utils = {
+let coreuiChartUtils = {
 
     /**
      * Получение значения поля
@@ -365,3 +365,5 @@ CoreUI.chart.utils = {
         ]
     }
 }
+
+export default coreuiChartUtils;

@@ -1,5 +1,8 @@
+import coreuiChart      from '../coreui.chart';
+import coreuiChartUtils from '../coreui.chart.utils';
+import apexCharts       from '../../../node_modules/apexcharts/dist/apexcharts.esm';
 
-CoreUI.chart.type.line = {
+coreuiChart.type.line = {
 
     _options: {},
     _apexOptions: {},
@@ -31,13 +34,13 @@ CoreUI.chart.type.line = {
         this._buildApexOptions();
 
         if (this._options.hasOwnProperty('options') &&
-            CoreUI.chart.utils.isObject(this._options.options) &&
+            coreuiChartUtils.isObject(this._options.options) &&
             this._options.options.debug
         ) {
             console.log($.extend(true, {}, this._apexOptions));
         }
 
-        this._apex = new CoreUI.chart.apex(container, this._apexOptions);
+        this._apex = new apexCharts(container, this._apexOptions);
         this._apex.render();
     },
 
@@ -70,7 +73,7 @@ CoreUI.chart.type.line = {
 
 
         if (this._options.hasOwnProperty('options') &&
-            CoreUI.chart.utils.isObject(this._options.options) &&
+            coreuiChartUtils.isObject(this._options.options) &&
             this._options.options.debug
         ) {
             console.log($.extend(true, {}, this._apexOptions));
@@ -148,7 +151,7 @@ CoreUI.chart.type.line = {
         this._apexOptions.series.splice(datasetKey, 1);
 
         if (this._options.hasOwnProperty('options') &&
-            CoreUI.chart.utils.isObject(this._options.options) &&
+            coreuiChartUtils.isObject(this._options.options) &&
             this._options.options.debug
         ) {
             console.log($.extend(true, {}, this._apexOptions));
@@ -241,7 +244,7 @@ CoreUI.chart.type.line = {
      */
     addAnnotation: function (annotation) {
 
-        if ( ! CoreUI.chart.utils.isObject(annotation) ||
+        if ( ! coreuiChartUtils.isObject(annotation) ||
              ! annotation.hasOwnProperty('type') ||
             typeof annotation.type !== 'string' ||
             ['yLine', 'xLine', 'point'].indexOf(annotation.type) < 0
@@ -250,7 +253,7 @@ CoreUI.chart.type.line = {
         }
 
         if (typeof annotation.id !== 'string') {
-            annotation.id = CoreUI.chart.utils.hashCode();
+            annotation.id = coreuiChartUtils.hashCode();
         }
 
         switch (annotation.type) {
@@ -326,9 +329,9 @@ CoreUI.chart.type.line = {
 
         // Styles
         if (this._options.hasOwnProperty('options') &&
-            CoreUI.chart.utils.isObject(this._options.options) &&
+            coreuiChartUtils.isObject(this._options.options) &&
             this._options.options.hasOwnProperty('style') &&
-            CoreUI.chart.utils.isObject(this._options.options.style)
+            coreuiChartUtils.isObject(this._options.options.style)
         ) {
             this._setOptionsStyles(this._options.options.style);
         }
@@ -336,7 +339,7 @@ CoreUI.chart.type.line = {
 
         // Datasets
         if (this._options.hasOwnProperty('datasets') &&
-            CoreUI.chart.utils.isArray(this._options.datasets)
+            coreuiChartUtils.isArray(this._options.datasets)
         ) {
 
             $.each(this._options.datasets, function (key, dataset) {
@@ -355,10 +358,10 @@ CoreUI.chart.type.line = {
 
 
         if (this._options.hasOwnProperty('annotations') &&
-            CoreUI.chart.utils.isArray(this._options.annotations)
+            coreuiChartUtils.isArray(this._options.annotations)
         ) {
             $.each(this._options.annotations, function (key, annotation) {
-                if ( ! CoreUI.chart.utils.isObject(annotation) ||
+                if ( ! coreuiChartUtils.isObject(annotation) ||
                     ! annotation.hasOwnProperty('type') ||
                     typeof annotation.type !== 'string'
                 ) {
@@ -368,7 +371,7 @@ CoreUI.chart.type.line = {
 
                 if (['yLine', 'xLine', 'point'].indexOf(annotation.type) >= 0) {
                     if (typeof annotation.id !== 'string') {
-                        annotation.id = CoreUI.chart.utils.hashCode();
+                        annotation.id = coreuiChartUtils.hashCode();
                     }
 
                     switch (annotation.type) {
@@ -419,7 +422,7 @@ CoreUI.chart.type.line = {
 
         let issetNoBar = false;
 
-        if (this._options.hasOwnProperty('datasets') && CoreUI.chart.utils.isArray(this._options.datasets)) {
+        if (this._options.hasOwnProperty('datasets') && coreuiChartUtils.isArray(this._options.datasets)) {
             $.each(this._options.datasets, function (key, dataset) {
                 if (dataset.hasOwnProperty('type') && dataset.type !== 'bar') {
                     issetNoBar = true;
@@ -477,7 +480,7 @@ CoreUI.chart.type.line = {
      */
     _getDatasetOptions: function (dataset) {
 
-        if ( ! CoreUI.chart.utils.isObject(dataset) ||
+        if ( ! coreuiChartUtils.isObject(dataset) ||
             ! dataset.hasOwnProperty('type') ||
             ! dataset.hasOwnProperty('name') ||
             typeof dataset.type !== 'string' ||
@@ -503,9 +506,9 @@ CoreUI.chart.type.line = {
 
         // Styles
         if (this._options.hasOwnProperty('options') &&
-            CoreUI.chart.utils.isObject(this._options.options) &&
+            coreuiChartUtils.isObject(this._options.options) &&
             this._options.options.hasOwnProperty('style') &&
-            CoreUI.chart.utils.isObject(this._options.options.style)
+            coreuiChartUtils.isObject(this._options.options.style)
         ) {
             style = this._options.options.style;
         }
@@ -581,7 +584,7 @@ CoreUI.chart.type.line = {
         }
 
         // Dataset style
-        if (dataset.hasOwnProperty('style') && CoreUI.chart.utils.isObject(dataset.style)) {
+        if (dataset.hasOwnProperty('style') && coreuiChartUtils.isObject(dataset.style)) {
             if (dataset.style.hasOwnProperty('color') && typeof dataset.style.color === 'string') {
                 color = dataset.style.color;
             }
@@ -729,7 +732,7 @@ CoreUI.chart.type.line = {
 
 
         // Events
-        if (annotation.hasOwnProperty('events') && CoreUI.chart.utils.isObject(annotation.events)) {
+        if (annotation.hasOwnProperty('events') && coreuiChartUtils.isObject(annotation.events)) {
             if (annotation.events.hasOwnProperty('mouseEnter')) {
                 if (typeof annotation.events.mouseEnter === 'function') {
                     yLine.label.mouseEnter = function() {
@@ -737,7 +740,7 @@ CoreUI.chart.type.line = {
                     }
 
                 } else if (typeof annotation.events.mouseEnter === 'string') {
-                    let func = CoreUI.chart.utils.getFunctionByName(annotation.events.mouseEnter);
+                    let func = coreuiChartUtils.getFunctionByName(annotation.events.mouseEnter);
                     if (typeof func === 'function') {
                         yLine.label.mouseEnter = function() {
                             func(annotation);
@@ -753,7 +756,7 @@ CoreUI.chart.type.line = {
                     }
 
                 } else if (typeof annotation.events.mouseLeave === 'string') {
-                    let func = CoreUI.chart.utils.getFunctionByName(annotation.events.mouseLeave);
+                    let func = coreuiChartUtils.getFunctionByName(annotation.events.mouseLeave);
                     if (typeof func === 'function') {
                         yLine.label.mouseLeave = function() {
                             func(annotation);
@@ -769,7 +772,7 @@ CoreUI.chart.type.line = {
                     }
 
                 } else if (typeof annotation.events.click === 'string') {
-                    let func = CoreUI.chart.utils.getFunctionByName(annotation.events.click);
+                    let func = coreuiChartUtils.getFunctionByName(annotation.events.click);
                     if (typeof func === 'function') {
                         yLine.label.click = function() {
                             func(annotation);
@@ -780,7 +783,7 @@ CoreUI.chart.type.line = {
         }
 
         // Annotation style
-        if (annotation.hasOwnProperty('style') && CoreUI.chart.utils.isObject(annotation.style)) {
+        if (annotation.hasOwnProperty('style') && coreuiChartUtils.isObject(annotation.style)) {
             if (annotation.style.hasOwnProperty('fillColor') && typeof annotation.style.fillColor === 'string') {
                 yLine.fillColor = annotation.style.fillColor;
             }
@@ -813,7 +816,7 @@ CoreUI.chart.type.line = {
 
 
             // Label style
-            if (annotation.style.hasOwnProperty('label') && CoreUI.chart.utils.isObject(annotation.style.label)) {
+            if (annotation.style.hasOwnProperty('label') && coreuiChartUtils.isObject(annotation.style.label)) {
                 if (annotation.style.label.hasOwnProperty('color') && typeof annotation.style.label.color === 'string') {
                     yLine.label.style.color = annotation.style.label.color;
                 }
@@ -884,7 +887,7 @@ CoreUI.chart.type.line = {
 
 
         // Events
-        if (annotation.hasOwnProperty('events') && CoreUI.chart.utils.isObject(annotation.events)) {
+        if (annotation.hasOwnProperty('events') && coreuiChartUtils.isObject(annotation.events)) {
             if (annotation.events.hasOwnProperty('mouseEnter')) {
                 if (typeof annotation.events.mouseEnter === 'function') {
                     xLine.label.mouseEnter = function() {
@@ -892,7 +895,7 @@ CoreUI.chart.type.line = {
                     }
 
                 } else if (typeof annotation.events.mouseEnter === 'string') {
-                    let func = CoreUI.chart.utils.getFunctionByName(annotation.events.mouseEnter);
+                    let func = coreuiChartUtils.getFunctionByName(annotation.events.mouseEnter);
                     if (typeof func === 'function') {
                         xLine.label.mouseEnter = function() {
                             func(annotation);
@@ -908,7 +911,7 @@ CoreUI.chart.type.line = {
                     }
 
                 } else if (typeof annotation.events.mouseLeave === 'string') {
-                    let func = CoreUI.chart.utils.getFunctionByName(annotation.events.mouseLeave);
+                    let func = coreuiChartUtils.getFunctionByName(annotation.events.mouseLeave);
                     if (typeof func === 'function') {
                         xLine.label.mouseLeave = function() {
                             func(annotation);
@@ -924,7 +927,7 @@ CoreUI.chart.type.line = {
                     }
 
                 } else if (typeof annotation.events.click === 'string') {
-                    let func = CoreUI.chart.utils.getFunctionByName(annotation.events.click);
+                    let func = coreuiChartUtils.getFunctionByName(annotation.events.click);
                     if (typeof func === 'function') {
                         xLine.label.click = function() {
                             func(annotation);
@@ -935,7 +938,7 @@ CoreUI.chart.type.line = {
         }
 
         // Annotation style
-        if (annotation.hasOwnProperty('style') && CoreUI.chart.utils.isObject(annotation.style)) {
+        if (annotation.hasOwnProperty('style') && coreuiChartUtils.isObject(annotation.style)) {
             if (annotation.style.hasOwnProperty('fillColor') && typeof annotation.style.fillColor === 'string') {
                 xLine.fillColor = annotation.style.fillColor;
             }
@@ -968,7 +971,7 @@ CoreUI.chart.type.line = {
 
 
             // Label style
-            if (annotation.style.hasOwnProperty('label') && CoreUI.chart.utils.isObject(annotation.style.label)) {
+            if (annotation.style.hasOwnProperty('label') && coreuiChartUtils.isObject(annotation.style.label)) {
                 if (annotation.style.label.hasOwnProperty('color') && typeof annotation.style.label.color === 'string') {
                     xLine.label.style.color = annotation.style.label.color;
                 }
@@ -1042,7 +1045,7 @@ CoreUI.chart.type.line = {
         }
 
         // Events
-        if (annotation.hasOwnProperty('events') && CoreUI.chart.utils.isObject(annotation.events)) {
+        if (annotation.hasOwnProperty('events') && coreuiChartUtils.isObject(annotation.events)) {
             if (annotation.events.hasOwnProperty('mouseEnter')) {
                 if (typeof annotation.events.mouseEnter === 'function') {
                     point.mouseEnter = function() {
@@ -1050,7 +1053,7 @@ CoreUI.chart.type.line = {
                     }
 
                 } else if (typeof annotation.events.mouseEnter === 'string') {
-                    let func = CoreUI.chart.utils.getFunctionByName(annotation.events.mouseEnter);
+                    let func = coreuiChartUtils.getFunctionByName(annotation.events.mouseEnter);
                     if (typeof func === 'function') {
                         point.mouseEnter = function() {
                             func(annotation);
@@ -1066,7 +1069,7 @@ CoreUI.chart.type.line = {
                     }
 
                 } else if (typeof annotation.events.mouseLeave === 'string') {
-                    let func = CoreUI.chart.utils.getFunctionByName(annotation.events.mouseLeave);
+                    let func = coreuiChartUtils.getFunctionByName(annotation.events.mouseLeave);
                     if (typeof func === 'function') {
                         point.mouseLeave = function() {
                             func(annotation);
@@ -1082,7 +1085,7 @@ CoreUI.chart.type.line = {
                     }
 
                 } else if (typeof annotation.events.click === 'string') {
-                    let func = CoreUI.chart.utils.getFunctionByName(annotation.events.click);
+                    let func = coreuiChartUtils.getFunctionByName(annotation.events.click);
                     if (typeof func === 'function') {
                         point.click = function() {
                             func(annotation);
@@ -1093,7 +1096,7 @@ CoreUI.chart.type.line = {
         }
 
         // Annotation style
-        if (annotation.hasOwnProperty('style') && CoreUI.chart.utils.isObject(annotation.style)) {
+        if (annotation.hasOwnProperty('style') && coreuiChartUtils.isObject(annotation.style)) {
             if (annotation.style.hasOwnProperty('fillColor') && typeof annotation.style.fillColor === 'string') {
                 point.marker.fillColor = annotation.style.fillColor;
             }
@@ -1130,7 +1133,7 @@ CoreUI.chart.type.line = {
 
 
             // Label style
-            if (annotation.style.hasOwnProperty('label') && CoreUI.chart.utils.isObject(annotation.style.label)) {
+            if (annotation.style.hasOwnProperty('label') && coreuiChartUtils.isObject(annotation.style.label)) {
                 if (annotation.style.label.hasOwnProperty('color') && typeof annotation.style.label.color === 'string') {
                     point.label.style.color = annotation.style.label.color;
                 }

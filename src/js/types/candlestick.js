@@ -1,5 +1,8 @@
+import coreuiChart      from '../coreui.chart';
+import coreuiChartUtils from '../coreui.chart.utils';
+import apexCharts       from '../../../node_modules/apexcharts/dist/apexcharts.esm';
 
-CoreUI.chart.type.candlestick = {
+coreuiChart.type.candlestick = {
 
     _options: {},
     _apexOptions: {},
@@ -30,13 +33,13 @@ CoreUI.chart.type.candlestick = {
         this._buildApexOptions();
 
         if (this._options.hasOwnProperty('options') &&
-            CoreUI.chart.utils.isObject(this._options.options) &&
+            coreuiChartUtils.isObject(this._options.options) &&
             this._options.options.debug
         ) {
             console.log($.extend(true, {}, this._apexOptions));
         }
 
-        this._apex = new CoreUI.chart.apex(container, this._apexOptions);
+        this._apex = new apexCharts(container, this._apexOptions);
         this._apex.render();
     },
 
@@ -56,9 +59,9 @@ CoreUI.chart.type.candlestick = {
 
         // Styles
         if (this._options.hasOwnProperty('options') &&
-            CoreUI.chart.utils.isObject(this._options.options) &&
+            coreuiChartUtils.isObject(this._options.options) &&
             this._options.options.hasOwnProperty('style') &&
-            CoreUI.chart.utils.isObject(this._options.options.style)
+            coreuiChartUtils.isObject(this._options.options.style)
         ) {
             style = this._options.options.style;
 
@@ -73,13 +76,13 @@ CoreUI.chart.type.candlestick = {
 
         // Datasets
         if (this._options.hasOwnProperty('datasets') &&
-            CoreUI.chart.utils.isArray(this._options.datasets)
+            coreuiChartUtils.isArray(this._options.datasets)
         ) {
 
             let datasetNum = 0;
 
             $.each(this._options.datasets, function (key, dataset) {
-                if ( ! CoreUI.chart.utils.isObject(dataset) ||
+                if ( ! coreuiChartUtils.isObject(dataset) ||
                     ! dataset.hasOwnProperty('type') ||
                     ! dataset.hasOwnProperty('name') ||
                     typeof dataset.type !== 'string' ||
@@ -140,7 +143,7 @@ CoreUI.chart.type.candlestick = {
                     }
 
                     // Dataset style
-                    if (dataset.hasOwnProperty('style') && CoreUI.chart.utils.isObject(dataset.style)) {
+                    if (dataset.hasOwnProperty('style') && coreuiChartUtils.isObject(dataset.style)) {
                         if (dataset.style.hasOwnProperty('color') && typeof dataset.style.color === 'string') {
                             color = dataset.style.color;
                         }
@@ -177,14 +180,14 @@ CoreUI.chart.type.candlestick = {
 
                     let labelNumber = 0;
                     $.each(dataset.data, function (key, item) {
-                        if (CoreUI.chart.utils.isObject(item) && item.hasOwnProperty('y')) {
+                        if (coreuiChartUtils.isObject(item) && item.hasOwnProperty('y')) {
                             let itemLabel = '';
 
                             if (item.hasOwnProperty('x')) {
                                 itemLabel = item.x;
 
                             } else if (that._options.hasOwnProperty('labels') &&
-                                CoreUI.chart.utils.isArray(that._options.labels) &&
+                                coreuiChartUtils.isArray(that._options.labels) &&
                                 that._options.labels.hasOwnProperty(labelNumber)
                             ) {
                                 itemLabel = that._options.labels[labelNumber];
@@ -204,7 +207,7 @@ CoreUI.chart.type.candlestick = {
                             // let itemLabel = '';
                             //
                             // if (that._options.hasOwnProperty('labels') &&
-                            //     CoreUI.chart.utils.isArray(that._options.labels) &&
+                            //     coreuiChartUtils.isArray(that._options.labels) &&
                             //     that._options.labels.hasOwnProperty(labelNumber)
                             // ) {
                             //     itemLabel = that._options.labels[labelNumber];

@@ -1,7 +1,7 @@
 
-var CoreUI = typeof CoreUI !== 'undefined' ? CoreUI : {};
+import coreuiChartInstance from './coreui.chart.instance';
 
-CoreUI.chart = {
+let coreuiChart = {
 
     lang: {},
     type: {},
@@ -18,7 +18,12 @@ CoreUI.chart = {
      * @returns {CoreUI.chart.instance}
      */
     create: function (options) {
-        let instance = $.extend(true, {}, this.instance);
+        let instance = $.extend(true, {}, coreuiChartInstance);
+
+        if ( ! options.hasOwnProperty('lang')) {
+            options.lang = coreuiChart.getSetting('lang');
+        }
+
         instance._init(options instanceof Object ? options : {});
 
         let chartId = instance.getId();
@@ -39,7 +44,7 @@ CoreUI.chart = {
             return null;
         }
 
-        if ($('#coreui-chart-' + this._instances[id])[0]) {
+        if ($('#coreui-chart-' + id)[0]) {
             delete this._instances[id];
             return null;
         }
@@ -54,7 +59,7 @@ CoreUI.chart = {
      */
     setSettings: function(settings) {
 
-        CoreUI.chart._settings = $.extend({}, this._settings, settings);
+        this._settings = $.extend({}, this._settings, settings);
     },
 
 
@@ -66,10 +71,13 @@ CoreUI.chart = {
 
         let value = null;
 
-        if (CoreUI.chart._settings.hasOwnProperty(name)) {
-            value = CoreUI.chart._settings[name];
+        if (this._settings.hasOwnProperty(name)) {
+            value = this._settings[name];
         }
 
         return value;
     }
 }
+
+
+export default coreuiChart;

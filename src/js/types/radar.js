@@ -1,5 +1,8 @@
+import coreuiChart      from '../coreui.chart';
+import coreuiChartUtils from '../coreui.chart.utils';
+import apexCharts       from '../../../node_modules/apexcharts/dist/apexcharts.esm';
 
-CoreUI.chart.type.radar = {
+coreuiChart.type.radar = {
 
     _options: {},
     _apexOptions: {},
@@ -30,13 +33,13 @@ CoreUI.chart.type.radar = {
         this._buildApexOptions();
 
         if (this._options.hasOwnProperty('options') &&
-            CoreUI.chart.utils.isObject(this._options.options) &&
+            coreuiChartUtils.isObject(this._options.options) &&
             this._options.options.debug
         ) {
             console.log($.extend(true, {}, this._apexOptions));
         }
 
-        this._apex = new CoreUI.chart.apex(container, this._apexOptions);
+        this._apex = new apexCharts(container, this._apexOptions);
         this._apex.render();
     },
 
@@ -58,9 +61,9 @@ CoreUI.chart.type.radar = {
 
         // Styles
         if (this._options.hasOwnProperty('options') &&
-            CoreUI.chart.utils.isObject(this._options.options) &&
+            coreuiChartUtils.isObject(this._options.options) &&
             this._options.options.hasOwnProperty('style') &&
-            CoreUI.chart.utils.isObject(this._options.options.style)
+            coreuiChartUtils.isObject(this._options.options.style)
         ) {
             style = this._options.options.style;
         }
@@ -68,12 +71,12 @@ CoreUI.chart.type.radar = {
 
         // Datasets
         if (this._options.hasOwnProperty('datasets') &&
-            CoreUI.chart.utils.isArray(this._options.datasets)
+            coreuiChartUtils.isArray(this._options.datasets)
         ) {
             let datasetNum = 0;
 
             $.each(this._options.datasets, function (key, dataset) {
-                if ( ! CoreUI.chart.utils.isObject(dataset) ||
+                if ( ! coreuiChartUtils.isObject(dataset) ||
                      ! dataset.hasOwnProperty('type') ||
                      typeof dataset.type !== 'string' ||
                      ! dataset.hasOwnProperty('name') ||
@@ -128,7 +131,7 @@ CoreUI.chart.type.radar = {
                     }
 
                     // Dataset style
-                    if (dataset.hasOwnProperty('style') && CoreUI.chart.utils.isObject(dataset.style)) {
+                    if (dataset.hasOwnProperty('style') && coreuiChartUtils.isObject(dataset.style)) {
                         if (dataset.style.hasOwnProperty('color') && typeof dataset.style.color === 'string') {
                             color = dataset.style.color;
                         }

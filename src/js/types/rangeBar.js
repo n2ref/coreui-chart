@@ -1,5 +1,8 @@
+import coreuiChart      from '../coreui.chart';
+import coreuiChartUtils from '../coreui.chart.utils';
+import apexCharts       from '../../../node_modules/apexcharts/dist/apexcharts.esm';
 
-CoreUI.chart.type.rangeBar = {
+coreuiChart.type.rangeBar = {
 
     _options: {},
     _apexOptions: {},
@@ -30,13 +33,13 @@ CoreUI.chart.type.rangeBar = {
         this._buildApexOptions();
 
         if (this._options.hasOwnProperty('options') &&
-            CoreUI.chart.utils.isObject(this._options.options) &&
+            coreuiChartUtils.isObject(this._options.options) &&
             this._options.options.debug
         ) {
             console.log($.extend(true, {}, this._apexOptions));
         }
 
-        this._apex = new CoreUI.chart.apex(container, this._apexOptions);
+        this._apex = new apexCharts(container, this._apexOptions);
         this._apex.render();
     },
 
@@ -56,9 +59,9 @@ CoreUI.chart.type.rangeBar = {
 
         // Styles
         if (this._options.hasOwnProperty('options') &&
-            CoreUI.chart.utils.isObject(this._options.options) &&
+            coreuiChartUtils.isObject(this._options.options) &&
             this._options.options.hasOwnProperty('style') &&
-            CoreUI.chart.utils.isObject(this._options.options.style)
+            coreuiChartUtils.isObject(this._options.options.style)
         ) {
             style = this._options.options.style;
 
@@ -92,13 +95,13 @@ CoreUI.chart.type.rangeBar = {
 
         // Datasets
         if (this._options.hasOwnProperty('datasets') &&
-            CoreUI.chart.utils.isArray(this._options.datasets)
+            coreuiChartUtils.isArray(this._options.datasets)
         ) {
 
             let datasetNum = 0;
 
             $.each(this._options.datasets, function (key, dataset) {
-                if ( ! CoreUI.chart.utils.isObject(dataset) ||
+                if ( ! coreuiChartUtils.isObject(dataset) ||
                     ! dataset.hasOwnProperty('type') ||
                     ! dataset.hasOwnProperty('name') ||
                     typeof dataset.type !== 'string' ||
@@ -164,7 +167,7 @@ CoreUI.chart.type.rangeBar = {
                     }
 
                     // Dataset style
-                    if (dataset.hasOwnProperty('style') && CoreUI.chart.utils.isObject(dataset.style)) {
+                    if (dataset.hasOwnProperty('style') && coreuiChartUtils.isObject(dataset.style)) {
                         if (dataset.style.hasOwnProperty('color') && typeof dataset.style.color === 'string') {
                             color = dataset.style.color;
                         }
@@ -216,11 +219,11 @@ CoreUI.chart.type.rangeBar = {
 
                     let labelNumber = 0;
                     $.each(dataset.data, function (key, item) {
-                        if (CoreUI.chart.utils.isArray(item)) {
+                        if (coreuiChartUtils.isArray(item)) {
                             let itemLabel = labelNumber + 1;
 
                             if (that._options.hasOwnProperty('labels') &&
-                                CoreUI.chart.utils.isArray(that._options.labels) &&
+                                coreuiChartUtils.isArray(that._options.labels) &&
                                 that._options.labels.hasOwnProperty(labelNumber)
                             ) {
                                 itemLabel = that._options.labels[labelNumber];
