@@ -1,6 +1,6 @@
 {
   "name": "coreui-chart",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "CoreUI Chart",
   "scripts": {
     "build_all": "gulp build_js_min && gulp build_js && gulp build_css_min && gulp build_css && npm run test_js",
