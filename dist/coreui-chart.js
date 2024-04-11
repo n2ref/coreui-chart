@@ -1586,6 +1586,7 @@
         events: {}
       }
     },
+    _id: '',
     _container: null,
     _apex: null,
     _typeInstance: null,
@@ -1597,9 +1598,7 @@
      */
     _init: function _init(options) {
       this._options = $.extend(true, {}, this._options, options);
-      if (!this._options.id) {
-        this._options.id = coreuiChartUtils.hashCode();
-      }
+      this._id = this._options.hasOwnProperty('id') && typeof this._options.id === 'string' && this._options.id ? this._options.id : coreuiChartUtils.hashCode();
       this._options.datasets = _typeof(this._options.datasets) === 'object' && Array.isArray(this._options.datasets) ? this._options.datasets : [];
       this._options.labels = _typeof(this._options.labels) === 'object' && Array.isArray(this._options.labels) ? this._options.labels : [];
       this._options.annotations = _typeof(this._options.annotations) === 'object' && Array.isArray(this._options.annotations) ? this._options.annotations : [];
@@ -1610,7 +1609,7 @@
      * @return {string|*|string|Promise<void>}
      */
     render: function render(element) {
-      var container = '<div id="coreui-chart-' + this._options.id + '" class="coreui-chart">' + '<div class="coreui-chart-container"></div>' + '</div>';
+      var container = '<div id="coreui-chart-' + this.getId() + '" class="coreui-chart">' + '<div class="coreui-chart-container"></div>' + '</div>';
       if (element === undefined) {
         return container;
       }
@@ -1625,7 +1624,7 @@
       }
       if (this._container) {
         $(this._container).append(container);
-        this._container = document.querySelector('#coreui-chart-' + this._options.id + ' > .coreui-chart-container');
+        this._container = document.querySelector('#coreui-chart-' + this.getId() + ' > .coreui-chart-container');
       }
       this.initEvents();
     },
@@ -1634,7 +1633,7 @@
      */
     initEvents: function initEvents() {
       if (!this._container) {
-        this._container = document.querySelector('#coreui-chart-' + this._options.id + ' > .coreui-chart-container');
+        this._container = document.querySelector('#coreui-chart-' + this.getId() + ' > .coreui-chart-container');
       }
       if (this._container) {
         var type = this._getTypeChart();
@@ -1672,7 +1671,7 @@
      * @return {string|null}
      */
     getId: function getId() {
-      return this._options.id;
+      return this._id;
     },
     /**
      * Получение параметров
@@ -1686,7 +1685,7 @@
      * @param {string} text
      */
     lock: function lock(text) {
-      var container = document.querySelector('#coreui-chart-' + this._options.id);
+      var container = document.querySelector('#coreui-chart-' + this.getId());
       if (container && !$(container).find('.coreui-chart-lock')[0]) {
         $(container).prepend('<div class="coreui-chart-lock">' + '<div class="coreui-chart-message">' + '<div class="spinner-border spinner-border-sm"></div> ' + (text ? '<span>' + text + '</span>' : '') + '</span>' + '</div>');
       }
@@ -1695,7 +1694,7 @@
      * Разблокировка
      */
     unlock: function unlock() {
-      $('#coreui-chart-' + this._options.id + ' > .coreui-chart-lock').fadeOut(50, function () {
+      $('#coreui-chart-' + this.getId() + ' > .coreui-chart-lock').fadeOut(50, function () {
         $(this).remove();
       });
     },

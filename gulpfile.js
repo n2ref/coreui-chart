@@ -92,7 +92,6 @@ gulp.task('build_js_min_fast', function() {
         plugins: [
             rollupCommonjs(),
             rollupSourcemaps(),
-            rollupSourcemaps(),
             rollupBabel({babelHelpers: 'bundled'}),
         ]
     })

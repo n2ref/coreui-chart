@@ -26,6 +26,7 @@ let coreuiChartInstance = {
         }
     },
 
+    _id: '',
     _container: null,
     _apex: null,
     _typeInstance: null,
@@ -40,10 +41,9 @@ let coreuiChartInstance = {
     _init: function (options) {
 
         this._options = $.extend(true, {}, this._options, options);
-
-        if ( ! this._options.id) {
-            this._options.id = coreuiChartUtils.hashCode();
-        }
+        this._id      = this._options.hasOwnProperty('id') && typeof this._options.id === 'string' && this._options.id
+            ? this._options.id
+            : coreuiChartUtils.hashCode();
 
         this._options.datasets = typeof this._options.datasets === 'object' && Array.isArray(this._options.datasets)
             ? this._options.datasets
@@ -65,7 +65,7 @@ let coreuiChartInstance = {
     render: function(element) {
 
         let container =
-            '<div id="coreui-chart-' + this._options.id + '" class="coreui-chart">' +
+            '<div id="coreui-chart-' + this.getId() + '" class="coreui-chart">' +
                 '<div class="coreui-chart-container"></div>' +
             '</div>';
 
@@ -88,7 +88,7 @@ let coreuiChartInstance = {
 
         if (this._container) {
             $(this._container).append(container);
-            this._container = document.querySelector('#coreui-chart-' + this._options.id + ' > .coreui-chart-container');
+            this._container = document.querySelector('#coreui-chart-' + this.getId() + ' > .coreui-chart-container');
         }
 
         this.initEvents();
@@ -101,7 +101,7 @@ let coreuiChartInstance = {
     initEvents: function () {
 
         if ( ! this._container) {
-            this._container = document.querySelector('#coreui-chart-' + this._options.id + ' > .coreui-chart-container');
+            this._container = document.querySelector('#coreui-chart-' + this.getId() + ' > .coreui-chart-container');
         }
 
         if (this._container) {
@@ -165,7 +165,7 @@ let coreuiChartInstance = {
      */
     getId: function () {
 
-        return this._options.id;
+        return this._id;
     },
 
 
@@ -185,7 +185,7 @@ let coreuiChartInstance = {
      */
     lock: function (text) {
 
-        let container = document.querySelector('#coreui-chart-' + this._options.id);
+        let container = document.querySelector('#coreui-chart-' + this.getId());
 
         if (container && ! $(container).find('.coreui-chart-lock')[0]) {
             $(container).prepend(
@@ -205,7 +205,7 @@ let coreuiChartInstance = {
      */
     unlock: function () {
 
-        $('#coreui-chart-' + this._options.id + ' > .coreui-chart-lock').fadeOut(50, function () {
+        $('#coreui-chart-' + this.getId() + ' > .coreui-chart-lock').fadeOut(50, function () {
             $(this).remove();
         });
     },
