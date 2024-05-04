@@ -1,6 +1,6 @@
 import coreuiChart      from '../coreui.chart';
 import coreuiChartUtils from '../coreui.chart.utils';
-import apexCharts       from '../../../node_modules/apexcharts/dist/apexcharts.esm';
+import apexCharts       from 'apexcharts/dist/apexcharts.esm';
 
 coreuiChart.type.line = {
 

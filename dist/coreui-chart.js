@@ -1573,6 +1573,7 @@
       annotations: [],
       options: {
         lang: 'en',
+        langList: {},
         dataUrl: null,
         width: null,
         height: null,
@@ -1591,12 +1592,15 @@
     _apex: null,
     _typeInstance: null,
     _events: {},
+    _chartWrapper: {},
     /**
      * Инициализация
+     * @param {object} chartWrapper
      * @param {object} options
      * @private
      */
-    _init: function _init(options) {
+    _init: function _init(chartWrapper, options) {
+      this._chartWrapper = chartWrapper;
       this._options = $.extend(true, {}, this._options, options);
       this._id = this._options.hasOwnProperty('id') && typeof this._options.id === 'string' && this._options.id ? this._options.id : coreuiChartUtils.hashCode();
       this._options.datasets = _typeof(this._options.datasets) === 'object' && Array.isArray(this._options.datasets) ? this._options.datasets : [];
@@ -1637,7 +1641,7 @@
       }
       if (this._container) {
         var type = this._getTypeChart();
-        if (!coreuiChart.type.hasOwnProperty(type)) {
+        if (!this._chartWrapper.type.hasOwnProperty(type)) {
           console.error('Chart type not found: ' + type);
           return;
         }
@@ -1657,7 +1661,7 @@
         } else {
           schemeColors = this._getColors(colorScheme);
         }
-        this._typeInstance = $.extend(true, {}, coreuiChart.type[type]);
+        this._typeInstance = $.extend(true, {}, this._chartWrapper.type[type]);
         this._typeInstance.init(this._options, apexOptions, schemeColors);
         this._apex = this._typeInstance.render(this._container);
         if (this._options.options.hasOwnProperty('dataUrl') && typeof this._options.options.dataUrl === 'string' && this._options.options.dataUrl) {
@@ -1879,7 +1883,7 @@
      * @private
      */
     getLang: function getLang() {
-      return coreuiChart.lang.hasOwnProperty(this._options.options.lang) ? coreuiChart.lang[this._options.options.lang] : coreuiChart.lang['en'];
+      return $.extend(true, {}, this._options.langList);
     },
     /**
      * @param name
@@ -2651,7 +2655,9 @@
       if (!options.hasOwnProperty('lang')) {
         options.lang = coreuiChart.getSetting('lang');
       }
-      instance._init(options instanceof Object ? options : {});
+      var langList = this.lang.hasOwnProperty(options.lang) ? this.lang[options.lang] : {};
+      options.langList = options.hasOwnProperty('langList') && coreuiChartUtils.isObject(options.langList) ? $.extend(true, {}, langList, options.langList) : langList;
+      instance._init(this, options instanceof Object ? options : {});
       var chartId = instance.getId();
       this._instances[chartId] = instance;
       return instance;

@@ -1,5 +1,6 @@
 
 import coreuiChartInstance from './coreui.chart.instance';
+import coreuiChartUtils    from './coreui.chart.utils';
 
 let coreuiChart = {
 
@@ -24,7 +25,12 @@ let coreuiChart = {
             options.lang = coreuiChart.getSetting('lang');
         }
 
-        instance._init(options instanceof Object ? options : {});
+        let langList     = this.lang.hasOwnProperty(options.lang) ? this.lang[options.lang] : {};
+        options.langList = options.hasOwnProperty('langList') && coreuiChartUtils.isObject(options.langList)
+            ? $.extend(true, {}, langList, options.langList)
+            : langList;
+
+        instance._init(this, options instanceof Object ? options : {});
 
         let chartId = instance.getId();
         this._instances[chartId] = instance;

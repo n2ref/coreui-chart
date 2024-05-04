@@ -1,7 +1,6 @@
 
 import coreuiChartUtils from './coreui.chart.utils';
-import coreuiChart      from './coreui.chart';
-import palette          from '../../node_modules/google-palette/palette';
+import palette          from 'google-palette/palette';
 
 let coreuiChartInstance = {
 
@@ -12,6 +11,7 @@ let coreuiChartInstance = {
         annotations: [],
         options: {
             lang: 'en',
+            langList: {},
             dataUrl: null,
             width: null,
             height: null,
@@ -31,17 +31,20 @@ let coreuiChartInstance = {
     _apex: null,
     _typeInstance: null,
     _events: {},
+    _chartWrapper: {},
 
 
     /**
      * Инициализация
+     * @param {object} chartWrapper
      * @param {object} options
      * @private
      */
-    _init: function (options) {
+    _init: function (chartWrapper, options) {
 
-        this._options = $.extend(true, {}, this._options, options);
-        this._id      = this._options.hasOwnProperty('id') && typeof this._options.id === 'string' && this._options.id
+        this._chartWrapper = chartWrapper;
+        this._options      = $.extend(true, {}, this._options, options);
+        this._id           = this._options.hasOwnProperty('id') && typeof this._options.id === 'string' && this._options.id
             ? this._options.id
             : coreuiChartUtils.hashCode();
 
@@ -107,7 +110,7 @@ let coreuiChartInstance = {
         if (this._container) {
             let type = this._getTypeChart();
 
-            if ( ! coreuiChart.type.hasOwnProperty(type)) {
+            if ( ! this._chartWrapper.type.hasOwnProperty(type)) {
                 console.error('Chart type not found: ' + type);
                 return;
             }
@@ -141,7 +144,7 @@ let coreuiChartInstance = {
             }
 
 
-            this._typeInstance = $.extend(true, {}, coreuiChart.type[type]);
+            this._typeInstance = $.extend(true, {}, this._chartWrapper.type[type]);
             this._typeInstance.init(this._options, apexOptions, schemeColors);
 
             this._apex = this._typeInstance.render(this._container);
@@ -455,9 +458,7 @@ let coreuiChartInstance = {
      */
     getLang: function () {
 
-        return coreuiChart.lang.hasOwnProperty(this._options.options.lang)
-            ? coreuiChart.lang[this._options.options.lang]
-            : coreuiChart.lang['en'];
+        return $.extend(true, {}, this._options.langList);
     },
 
 

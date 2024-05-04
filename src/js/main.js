@@ -2,9 +2,6 @@
 
 import coreuiChart from "./coreui.chart";
 
-import './coreui.chart.instance.js';
-import './coreui.chart.utils.js';
-
 import './types/pie';
 import './types/line';
 import './types/box';
