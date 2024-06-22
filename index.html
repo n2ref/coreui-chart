@@ -31,9 +31,8 @@
                                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                                         <li class="nav-item"><a class="nav-link" href="https://n2ref.github.io/coreui-panel">Panel</a></li>
                                         <li class="nav-item"><a class="nav-link" href="https://n2ref.github.io/coreui-form">Form</a></li>
-                                        <li class="nav-item"><a class="nav-link" href="https://n2ref.github.io/coreui-tabs">Tabs</a></li>
-                                        <li class="nav-item"><a class="nav-link" href="https://n2ref.github.io/coreui-layout">Layout</a></li>
                                         <li class="nav-item"><a class="nav-link" href="https://n2ref.github.io/coreui-table">Table</a></li>
+                                        <li class="nav-item"><a class="nav-link" href="https://n2ref.github.io/coreui-layout">Layout</a></li>
                                         <li class="nav-item"><a class="nav-link" href="https://n2ref.github.io/coreui-info">Info</a></li>
                                         <li class="nav-item"><a class="nav-link" href="https://n2ref.github.io/coreui-modal">Modal</a></li>
                                         <li class="nav-item"><a class="nav-link" href="https://n2ref.github.io/coreui-notice">Notice</a></li>
@@ -54,7 +53,7 @@
                     <div id="docs-sidenav" class="hidden-xs hidden-sm hidden-md d-none d-lg-block"
                          data-bs-spy="affix" data-bs-offset-top="90" data-bs-offset-bottom="70">
                         <ul class="nav">
-                            <li><a href="#download">Download</a></li>
+                            <li><a href="#get-started">Get started</a></li>
                             <li>
                                 <a href="#examples">Examples</a>
                                 <ul class="nav">
@@ -99,33 +98,38 @@
                     </div>
                 </div>
                 <div class="col-lg-10">
-                    <h2 id="download">Download</h2>
-                    <div>
+                    <div id="get-started">
+                        <h2 class="mb-4">Get started</h2>
+
+                        <div id="download">
+                            <h4>Download</h4>
+                            <p>
+                                You can download a minimized version of the library or get the full source code at github.com.
+                            </p>
+                            <a class="btn btn-secondary" href="https://github.com/n2ref/coreui-chart/archive/master.zip">Download source</a>
+                        </div>
+
+
+                        <h4 class="section-margin">Install with npm</h4>
+                        <pre><code class="bash">$ npm install coreui-chart</code></pre>
+
+                        <h4 class="section-margin">Требования</h4>
                         <p>
-                            You can download a minimized version of the library or get the full source code at github.com.
+                            Для корректной работы на странице необходимо наличие:
+                            <a href="https://getbootstrap.com/docs/5.3" target="_blank">Bootstrap 5</a>,
+                            <a href="https://jquery.com" target="_blank">jquery</a>
                         </p>
-                        <a class="btn btn-secondary" href="https://github.com/n2ref/coreui-chart/archive/master.zip">Download source</a>
                     </div>
 
 
-                    <h2 class="section-margin">Install with npm</h2>
-                    <pre><code class="bash">$ npm install coreui-chart</code></pre>
-
-
-                    <h2 class="section-margin">Требования</h2>
-                    <p>
-                        Для корректной работы на странице необходимо наличие:
-                        <a href="https://getbootstrap.com/docs/5.3" target="_blank">Bootstrap 5</a>,
-                        <a href="https://jquery.com" target="_blank">jquery</a>
-                    </p>
-
-                    <h2 id="examples" class="section-margin mb-3">Examples</h2>
                     <div>
+                        <h2 id="examples" class="section-margin mb-3">Examples</h2>
 
-                        <h3 id="example-types" class="mb-3">Types</h3>
-                        <div>
-                            <h5 id="example-type-line">Line</h5>
-                            <div class="mb-4">
+                        <div id="example-types">
+                            <h3 class="mb-3">Types</h3>
+
+                            <div id="example-type-line" class="mb-4">
+                                <h5>Line</h5>
                                 <div class="content-example">
                                     <div id="chart-line"></div>
                                 </div>
@@ -220,8 +224,8 @@
                             </div>
 
 
-                            <h5 id="example-type-bar">Bar</h5>
-                            <div class="mb-4">
+                            <div id="example-type-bar" class="mb-4">
+                                <h5>Bar</h5>
                                 <div class="content-example">
                                     <div id="chart-bar"></div>
                                 </div>
@@ -288,8 +292,8 @@
                             </div>
 
 
-                            <h5 id="example-type-points">Points</h5>
-                            <div class="mb-4">
+                            <div id="example-type-points" class="mb-4">
+                                <h5>Points</h5>
                                 <div class="content-example">
                                     <div id="chart-points"></div>
                                 </div>
@@ -348,8 +352,8 @@
                             </div>
 
 
-                            <h5 id="example-type-bar-horizontal">Horizontal bar</h5>
-                            <div class="mb-4">
+                            <div id="example-type-bar-horizontal" class="mb-4">
+                                <h5>Horizontal bar</h5>
                                 <div class="content-example">
                                     <div id="chart-bar-horizontal"></div>
                                 </div>
@@ -407,8 +411,8 @@
                             </div>
 
 
-                            <h5 id="example-type-range-area">Range area</h5>
-                            <div class="mb-4">
+                            <div id="example-type-range-area" class="mb-4">
+                                <h5>Range area</h5>
                                 <div class="content-example">
                                     <div id="chart-range-area"></div>
                                 </div>
@@ -480,8 +484,8 @@
                             </div>
 
 
-                            <h5 id="example-type-range-bars">Range bars</h5>
-                            <div class="mb-4">
+                            <div id="example-type-range-bars" class="mb-4">
+                                <h5>Range bars</h5>
                                 <div class="content-example">
                                     <div id="chart-range-bars"></div>
                                 </div>
@@ -543,8 +547,8 @@
                             </div>
 
 
-                            <h5 id="example-type-candlestick">Candlestick</h5>
-                            <div class="mb-4">
+                            <div id="example-type-candlestick" class="mb-4">
+                                <h5>Candlestick</h5>
                                 <div class="content-example">
                                     <div id="chart-candlestick"></div>
                                 </div>
@@ -621,8 +625,8 @@
                             </div>
 
 
-                            <h5 id="example-type-box">Box</h5>
-                            <div class="mb-4">
+                            <div id="example-type-box" class="mb-4">
+                                <h5>Box</h5>
                                 <div class="content-example">
                                     <div id="chart-box"></div>
                                 </div>
@@ -681,8 +685,8 @@
                             </div>
 
 
-                            <h5 id="example-type-pie">Pie</h5>
-                            <div class="mb-4">
+                            <div id="example-type-pie" class="mb-4">
+                                <h5>Pie</h5>
                                 <div class="content-example">
                                     <div id="chart-pie"></div>
                                 </div>
@@ -728,8 +732,8 @@
                             </div>
 
 
-                            <h5 id="example-type-donut">Donut</h5>
-                            <div class="mb-4">
+                            <div id="example-type-donut" class="mb-4">
+                                <h5>Donut</h5>
                                 <div class="content-example">
                                     <div id="chart-donut"></div>
                                 </div>
@@ -782,8 +786,8 @@
                             </div>
 
 
-                            <h5 id="example-type-radial-bar">Radial Bar</h5>
-                            <div class="mb-4">
+                            <div id="example-type-radial-bar" class="mb-4">
+                                <h5>Radial Bar</h5>
                                 <div class="content-example">
                                     <div id="chart-radial-bar"></div>
                                 </div>
@@ -841,8 +845,8 @@
                             </div>
 
 
-                            <h5 id="example-type-radar">Radar</h5>
-                            <div class="mb-4">
+                            <div id="example-type-radar" class="mb-4">
+                                <h5>Radar</h5>
                                 <div class="content-example">
                                     <div id="chart-radar"></div>
                                 </div>
@@ -900,8 +904,8 @@
                             </div>
 
 
-                            <h5 id="example-type-polar-area">Polar area</h5>
-                            <div class="mb-4">
+                            <div id="example-type-polar-area" class="mb-4">
+                                <h5>Polar area</h5>
                                 <div class="content-example">
                                     <div id="chart-polar-area"></div>
                                 </div>
@@ -944,8 +948,8 @@
                         </div>
 
 
-                        <h3 id="example-mixed">Mixed</h3>
-                        <div class="mb-4">
+                        <div id="example-mixed" class="mb-4">
+                            <h3>Mixed</h3>
                             <div class="content-example">
                                 <div id="chart-mixed"></div>
                             </div>
@@ -1018,8 +1022,8 @@
                         </div>
 
 
-                        <h3 id="example-stacked">Stacked</h3>
-                        <div class="mb-4">
+                        <div id="example-stacked" class="mb-4">
+                            <h3>Stacked</h3>
                             <div class="content-example">
                                 <div id="chart-stacked"></div>
                             </div>
@@ -1063,8 +1067,8 @@
                         </div>
 
 
-                        <h3 id="example-stacked-100">Stacked 100%</h3>
-                        <div class="mb-4">
+                        <div id="example-stacked-100" class="mb-4">
+                            <h3>Stacked 100%</h3>
                             <div class="content-example">
                                 <div id="chart-stacked-100"></div>
                             </div>
@@ -1105,8 +1109,8 @@
                         </div>
 
 
-                        <h3 id="example-annotations">Annotations</h3>
-                        <div class="mb-4">
+                        <div id="example-annotations" class="mb-4">
+                            <h3>Annotations</h3>
                             <div class="content-example">
                                 <div id="chart-annotations"></div>
                                 <button class="btn btn-sm btn-secondary" id="btn-add-annotation">Add annotation</button>
@@ -1307,8 +1311,8 @@
                         </div>
 
 
-                        <h3 id="example-load-data">Load data</h3>
-                        <div class="mb-4">
+                        <div id="example-load-data" class="mb-4">
+                            <h3>Load data</h3>
                             <div class="content-example">
                                 <div id="chart-load-data"></div>
                                 <button class="btn btn-sm btn-secondary" id="btn-load-data">Load data</button>
@@ -1346,8 +1350,8 @@
                         </div>
 
 
-                        <h3 id="example-update">Update chart</h3>
-                        <div class="mb-4">
+                        <div id="example-update" class="mb-4">
+                            <h3>Update chart</h3>
                             <div class="content-example">
                                 <div id="chart-update"></div>
                                 <button class="btn btn-sm btn-secondary" id="btn-add-dataset">Add dataset</button>
@@ -1441,8 +1445,8 @@
                         </div>
 
 
-                        <h3 id="example-toolbar">Toolbar, Zoom</h3>
-                        <div class="mb-4">
+                        <div id="example-toolbar" class="mb-4">
+                            <h3>Toolbar, Zoom</h3>
                             <div class="content-example">
                                 <div id="chart-toolbar"></div>
                             </div>
@@ -1495,8 +1499,8 @@
                         </div>
 
 
-                        <h3 id="example-events">Events</h3>
-                        <div class="mb-4">
+                        <div id="example-events" class="mb-4">
+                            <h3>Events</h3>
                             <div class="content-example">
                                 <div id="chart-events"></div>
                             </div>
@@ -1557,8 +1561,8 @@
                         </div>
 
 
-                        <h3 id="example-grid">Grid</h3>
-                        <div class="mb-4">
+                        <div id="example-grid" class="mb-4">
+                            <h3>Grid</h3>
                             <div class="content-example">
                                 <div id="chart-grid"></div>
                             </div>
@@ -1620,8 +1624,8 @@
                         </div>
 
 
-                        <h3 id="example-missing">Missing / Null values</h3>
-                        <div class="mb-4">
+                        <div id="example-missing" class="mb-4">
+                            <h3>Missing / Null values</h3>
                             <div class="content-example">
                                 <div id="chart-missing"></div>
                             </div>
@@ -1663,8 +1667,8 @@
                         </div>
 
 
-                        <h3 id="example-theme">Theme</h3>
-                        <div class="mb-4">
+                        <div id="example-theme" class="mb-4">
+                            <h3>Theme</h3>
                             <div class="content-example">
                                 <div id="chart-theme"></div>
                             </div>
@@ -1718,8 +1722,8 @@
                     </div>
 
 
-                    <h2 id="options" class="section-margin">Options</h2>
-                    <div class="table-responsive mb-4">
+                    <div id="options" class="table-responsive mb-4">
+                        <h2 class="section-margin">Options</h2>
                         <table class="table table-bordered table-striped js-options-table">
                             <thead>
                             <tr>
@@ -1754,8 +1758,8 @@
                         </table>
                     </div>
 
-                    <h2 id="options-datasets" class="section-margin">Options Datasets</h2>
-                    <div class="table-responsive mb-4">
+                    <div id="options-datasets" class="table-responsive mb-4">
+                        <h2 class="section-margin">Options Datasets</h2>
                         <table class="table table-bordered table-striped js-options-table">
                             <thead>
                             <tr>
@@ -1786,8 +1790,8 @@
                         </table>
                     </div>
 
-                    <h2 id="options-annotations" class="section-margin">Options Annotations</h2>
-                    <div class="table-responsive mb-4">
+                    <div id="options-annotations" class="table-responsive mb-4">
+                        <h2 class="section-margin">Options Annotations</h2>
                         <table class="table table-bordered table-striped js-options-table">
                             <thead>
                             <tr>
@@ -1826,8 +1830,8 @@
                         </table>
                     </div>
 
-                    <h2 id="options-chart" class="section-margin">Options Chart</h2>
-                    <div class="table-responsive mb-4">
+                    <div id="options-chart" class="table-responsive mb-4">
+                        <h2 class="section-margin">Options Chart</h2>
                         <table class="table table-bordered table-striped js-options-table">
                             <thead>
                             <tr>
@@ -1894,8 +1898,8 @@
                         </table>
                     </div>
 
-                    <h2 id="methods" class="section-margin">Methods</h2>
-                    <div class="table-responsive mb-4">
+                    <div id="methods" class="table-responsive mb-4">
+                        <h2 class="section-margin">Methods</h2>
                         <table class="table table-bordered table-striped js-options-table">
                             <thead>
                             <tr>
@@ -2143,8 +2147,8 @@
                     </div>
 
 
-                    <h2 id="events" class="section-margin">Events</h2>
-                    <div class="table-responsive mb-4">
+                    <div id="events" class="table-responsive mb-4">
+                        <h2 class="section-margin">Events</h2>
                         <table class="table table-bordered table-striped js-options-table">
                             <thead>
                             <tr>
