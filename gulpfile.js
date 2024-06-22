@@ -7,7 +7,7 @@ const rollup           = require('@rollup/stream');
 const rollupSourcemaps = require('rollup-plugin-sourcemaps');
 const rollupBabel      = require('@rollup/plugin-babel');
 const rollupCommonjs   = require('@rollup/plugin-commonjs');
-const rollupNodeResolve = require('@rollup/plugin-node-resolve');
+const rollupResolve    = require('@rollup/plugin-node-resolve');
 const source           = require('vinyl-source-stream');
 const buffer           = require("vinyl-buffer");
 
@@ -66,7 +66,7 @@ gulp.task('build_js_min', function() {
         },
         context: "window",
         plugins: [
-            rollupNodeResolve(),
+            rollupResolve(),
             rollupCommonjs(),
             rollupSourcemaps(),
             rollupBabel({babelHelpers: 'bundled'}),
@@ -90,6 +90,7 @@ gulp.task('build_js_min_fast', function() {
         },
         context: "window",
         plugins: [
+            rollupResolve(),
             rollupCommonjs(),
             rollupSourcemaps(),
             rollupBabel({babelHelpers: 'bundled'}),
@@ -112,7 +113,7 @@ gulp.task('build_js', function() {
         },
         context: "window",
         plugins: [
-            rollupNodeResolve(),
+            rollupResolve(),
             rollupCommonjs(),
             rollupBabel({babelHelpers: 'bundled'}),
         ]
