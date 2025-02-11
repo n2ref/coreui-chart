@@ -1,7 +1,5 @@
 
-import coreuiChart from "../coreui.chart";
-
-coreuiChart.lang.ru = {
+let langRu = {
     loading: 'Загрузка',
     months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
     shortMonths: ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"],
@@ -20,3 +18,4 @@ coreuiChart.lang.ru = {
         reset: "Сбросить увеличение"
     }
 }
+export default langRu;

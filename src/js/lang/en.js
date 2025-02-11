@@ -1,7 +1,5 @@
 
-import coreuiChart from "../coreui.chart";
-
-coreuiChart.lang.en = {
+let langEn = {
     loading: 'Loading',
     months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     shortMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -20,3 +18,5 @@ coreuiChart.lang.en = {
         reset: "Reset Zoom"
     }
 }
+
+export default langEn;

@@ -4,6 +4,20 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, (global.CoreUI = global.CoreUI || {}, global.CoreUI.chart = factory()));
 })(this, (function () { 'use strict';
 
+  function _toPrimitive(t, r) {
+    if ("object" != typeof t || !t) return t;
+    var e = t[Symbol.toPrimitive];
+    if (void 0 !== e) {
+      var i = e.call(t, r || "default");
+      if ("object" != typeof i) return i;
+      throw new TypeError("@@toPrimitive must return a primitive value.");
+    }
+    return ("string" === r ? String : Number)(t);
+  }
+  function _toPropertyKey(t) {
+    var i = _toPrimitive(t, "string");
+    return "symbol" == typeof i ? i : i + "";
+  }
   function _typeof(o) {
     "@babel/helpers - typeof";
 
@@ -13,21 +27,44 @@
       return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
     }, _typeof(o);
   }
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+  function _defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor);
+    }
+  }
+  function _createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    Object.defineProperty(Constructor, "prototype", {
+      writable: false
+    });
+    return Constructor;
+  }
+  function _defineProperty(obj, key, value) {
+    key = _toPropertyKey(key);
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+    return obj;
+  }
 
-  var coreuiChartUtils = {
-    /**
-     * Получение значения поля
-     * @param {CoreUI.chart.instance} chart
-     * @param {object}               fieldOptions
-     * @returns {string|number|null}
-     */
-    getFieldValue: function getFieldValue(chart, fieldOptions) {
-      var chartRecord = chart.getRecord();
-      if (fieldOptions && chartRecord && typeof fieldOptions.name === 'string' && _typeof(chartRecord) === 'object' && chartRecord.hasOwnProperty(fieldOptions.name) && ['string', 'number', 'object'].indexOf(_typeof(chartRecord[fieldOptions.name])) >= 0) {
-        return chartRecord[fieldOptions.name];
-      }
-      return '';
-    },
+  var ChartUtils = {
     /**
      * Получение функции из указанного текста
      * @param functionName
@@ -50,156 +87,6 @@
         return context[func];
       }
       return null;
-    },
-    /**
-     * Обработка полей в полях
-     * @param chart
-     * @param defaultOptions
-     * @param fieldOptions
-     */
-    mergeFieldOptions: function mergeFieldOptions(chart, defaultOptions, fieldOptions) {
-      var options = $.extend(true, {}, defaultOptions);
-      if (fieldOptions) {
-        if (options.hasOwnProperty('attr') && _typeof(options.attr) === 'object' && fieldOptions.hasOwnProperty('attr') && _typeof(fieldOptions.attr) === 'object') {
-          fieldOptions.attr = this.mergeAttr(options.attr, fieldOptions.attr);
-        }
-        options = $.extend(true, {}, options, fieldOptions);
-      }
-      if (options.hasOwnProperty('width')) {
-        if (options.width) {
-          var unit = typeof options.width === 'number' ? 'px' : '';
-          options.width = options.width + unit;
-        } else if (chart._options.fieldWidth && options.type !== 'color') {
-          var _unit = typeof chart._options.fieldWidth === 'number' ? 'px' : '';
-          options.width = chart._options.fieldWidth + _unit;
-        }
-      }
-      if (options.hasOwnProperty('labelWidth')) {
-        if (options.labelWidth >= 0 && options.labelWidth !== null) {
-          var _unit2 = typeof options.labelWidth === 'number' ? 'px' : '';
-          options.labelWidth = options.labelWidth + _unit2;
-        } else if (chart._options.labelWidth) {
-          var _unit3 = typeof chart._options.labelWidth === 'number' ? 'px' : '';
-          options.labelWidth = chart._options.labelWidth + _unit3;
-        }
-      }
-      return options;
-    },
-    /**
-     * Объединение атрибутов
-     * @param attr1
-     * @param attr2
-     * @returns {object}
-     */
-    mergeAttr: function mergeAttr(attr1, attr2) {
-      var mergeAttr = Object.assign({}, attr1);
-      if (_typeof(attr2) === 'object') {
-        $.each(attr2, function (name, value) {
-          if (mergeAttr.hasOwnProperty(name)) {
-            if (name === 'class') {
-              mergeAttr[name] += ' ' + value;
-            } else if (name === 'style') {
-              mergeAttr[name] += ';' + value;
-            } else {
-              mergeAttr[name] = value;
-            }
-          } else {
-            mergeAttr[name] = value;
-          }
-        });
-      }
-      return mergeAttr;
-    },
-    /**
-     * Инициализация и рендер дополнительных полей
-     * @param {CoreUI.chart.instance} chart
-     * @param {object}               options
-     * @returns {object}
-     * @private
-     */
-    getAttacheFields: function getAttacheFields(chart, options) {
-      var fields = [];
-      if (_typeof(options) === 'object' && _typeof(options.fields) === 'object' && Array.isArray(options.fields)) {
-        $.each(options.fields, function (key, field) {
-          var instance = chart.initField(field);
-          if (_typeof(instance) !== 'object') {
-            return;
-          }
-          fields.push({
-            hash: instance._hash,
-            direction: options.hasOwnProperty('fieldsDirection') ? options.fieldsDirection : 'row',
-            content: instance.renderContent()
-          });
-        });
-      }
-      return fields;
-    },
-    /**
-     * Форматирование даты
-     * @param {string} value
-     * @return {string}
-     */
-    chartatDate: function chartatDate(value) {
-      if (value && value.length === 10) {
-        var date = new Date(value);
-        var year = date.getFullYear();
-        var month = date.getMonth() + 1;
-        var day = date.getDate();
-        day = day < 10 ? '0' + day : day;
-        month = month < 10 ? '0' + month : month;
-        value = day + '.' + month + '.' + year;
-      }
-      return value;
-    },
-    /**
-     * Форматирование даты со временем
-     * @param {string} value
-     * @return {string}
-     */
-    chartatDateTime: function chartatDateTime(value) {
-      if (value && value.length >= 10) {
-        var date = new Date(value);
-        var year = date.getFullYear();
-        var month = date.getMonth() + 1;
-        var day = date.getDate();
-        var hour = ("00" + date.getHours()).slice(-2);
-        var min = ("00" + date.getMinutes()).slice(-2);
-        var sec = ("00" + date.getSeconds()).slice(-2);
-        day = day < 10 ? '0' + day : day;
-        month = month < 10 ? '0' + month : month;
-        value = day + '.' + month + '.' + year + ' ' + hour + ':' + min + ':' + sec;
-      }
-      return value;
-    },
-    /**
-     * Форматирование даты со временем
-     * @param {string} value
-     * @param {object} lang
-     * @return {string}
-     */
-    chartatDateMonth: function chartatDateMonth(value, lang) {
-      if (value && value.length === 7) {
-        var date = new Date(value);
-        var year = date.getFullYear();
-        var month = date.getMonth();
-        var monthLang = lang.date_months.hasOwnProperty(month) ? lang.date_months[month] : '';
-        value = monthLang + ' ' + year;
-      }
-      return value;
-    },
-    /**
-     * Форматирование даты со временем
-     * @param {string} value
-     * @param {object} lang
-     * @return {string}
-     */
-    chartatDateWeek: function chartatDateWeek(value, lang) {
-      if (value && value.length >= 7) {
-        var year = value.substring(0, 4);
-        var week = value.substring(6);
-        value = year + ' ' + lang.date_week + ' ' + week;
-      }
-      return value;
     },
     /**
      * Проверка на число
@@ -1565,1080 +1452,1178 @@
   var paletteExports = palette$1.exports;
   var palette = /*@__PURE__*/getDefaultExportFromCjs(paletteExports);
 
-  var coreuiChartInstance = {
-    _options: {
-      id: null,
-      labels: [],
-      datasets: [],
-      annotations: [],
-      options: {
-        lang: 'en',
-        langList: {},
-        dataUrl: null,
-        width: null,
-        height: null,
-        title: {},
-        enabled: {},
-        legend: {},
-        tooltip: {},
-        theme: {},
-        axis: {},
-        style: {},
-        events: {}
-      }
-    },
-    _id: '',
-    _container: null,
-    _apex: null,
-    _typeInstance: null,
-    _events: {},
-    _chartWrapper: {},
+  var ChartInstance = /*#__PURE__*/function () {
     /**
      * Инициализация
      * @param {object} chartWrapper
      * @param {object} options
      * @private
      */
-    _init: function _init(chartWrapper, options) {
+    function ChartInstance(chartWrapper, options) {
+      _classCallCheck(this, ChartInstance);
+      _defineProperty(this, "_options", {
+        id: null,
+        labels: [],
+        datasets: [],
+        annotations: [],
+        options: {
+          lang: 'en',
+          langList: {},
+          dataUrl: null,
+          width: null,
+          height: null,
+          title: {},
+          enabled: {},
+          legend: {},
+          tooltip: {},
+          theme: {},
+          axis: {},
+          style: {},
+          events: {}
+        }
+      });
+      _defineProperty(this, "_id", '');
+      _defineProperty(this, "_container", null);
+      _defineProperty(this, "_apex", null);
+      _defineProperty(this, "_typeInstance", null);
+      _defineProperty(this, "_events", {});
+      _defineProperty(this, "_chartWrapper", {});
       this._chartWrapper = chartWrapper;
       this._options = $.extend(true, {}, this._options, options);
-      this._id = this._options.hasOwnProperty('id') && typeof this._options.id === 'string' && this._options.id ? this._options.id : coreuiChartUtils.hashCode();
+      this._id = this._options.hasOwnProperty('id') && typeof this._options.id === 'string' && this._options.id ? this._options.id : ChartUtils.hashCode();
       this._options.datasets = _typeof(this._options.datasets) === 'object' && Array.isArray(this._options.datasets) ? this._options.datasets : [];
       this._options.labels = _typeof(this._options.labels) === 'object' && Array.isArray(this._options.labels) ? this._options.labels : [];
       this._options.annotations = _typeof(this._options.annotations) === 'object' && Array.isArray(this._options.annotations) ? this._options.annotations : [];
-    },
+    }
+
     /**
      * Формирование html компонента
      * @param element
      * @return {string|*|string|Promise<void>}
      */
-    render: function render(element) {
-      var container = '<div id="coreui-chart-' + this.getId() + '" class="coreui-chart">' + '<div class="coreui-chart-container"></div>' + '</div>';
-      if (element === undefined) {
-        return container;
-      }
-      if (typeof element === 'string') {
-        var domElement = document.getElementById(element);
-        if (!domElement) {
-          return;
+    return _createClass(ChartInstance, [{
+      key: "render",
+      value: function render(element) {
+        var container = '<div id="coreui-chart-' + this.getId() + '" class="coreui-chart">' + '<div class="coreui-chart-container"></div>' + '</div>';
+        if (element === undefined) {
+          return container;
         }
-        this._container = domElement;
-      } else if (element instanceof HTMLElement) {
-        this._container = element;
-      }
-      if (this._container) {
-        $(this._container).append(container);
-        this._container = document.querySelector('#coreui-chart-' + this.getId() + ' > .coreui-chart-container');
-      }
-      this.initEvents();
-    },
-    /**
-     * Инициализация событий компонента
-     */
-    initEvents: function initEvents() {
-      if (!this._container) {
-        this._container = document.querySelector('#coreui-chart-' + this.getId() + ' > .coreui-chart-container');
-      }
-      if (this._container) {
-        var type = this._getTypeChart();
-        if (!this._chartWrapper.type.hasOwnProperty(type)) {
-          console.error('Chart type not found: ' + type);
-          return;
-        }
-        var apexOptions = {};
-        if (this._options.hasOwnProperty('custom') && coreuiChartUtils.isObject(this._options.custom)) {
-          apexOptions = this._options.custom;
-        } else {
-          apexOptions = this._convertToApex(this._options);
-        }
-        var colorScheme = 'classic';
-        var schemeColors = [];
-        if (this._options.options.hasOwnProperty('theme') && coreuiChartUtils.isObject(this._options.options.theme) && this._options.options.theme.hasOwnProperty('colorScheme') && typeof this._options.options.theme.colorScheme === 'string') {
-          colorScheme = this._options.options.theme.colorScheme;
-        }
-        if (colorScheme === 'custom' && this._options.options.theme.hasOwnProperty('customColors') && Array.isArray(this._options.options.theme.customColors)) {
-          schemeColors = this._options.options.theme.customColors;
-        } else {
-          schemeColors = this._getColors(colorScheme);
-        }
-        this._typeInstance = $.extend(true, {}, this._chartWrapper.type[type]);
-        this._typeInstance.init(this._options, apexOptions, schemeColors);
-        this._apex = this._typeInstance.render(this._container);
-        if (this._options.options.hasOwnProperty('dataUrl') && typeof this._options.options.dataUrl === 'string' && this._options.options.dataUrl) {
-          this.loadData(this._options.options.dataUrl);
-        }
-        this._trigger('shown.coreui.chart');
-      }
-    },
-    /**
-     * Получение id графика
-     * @return {string|null}
-     */
-    getId: function getId() {
-      return this._id;
-    },
-    /**
-     * Получение параметров
-     * @returns {object}
-     */
-    getOptions: function getOptions() {
-      return $.extend(true, {}, this._options);
-    },
-    /**
-     * Блокировка
-     * @param {string} text
-     */
-    lock: function lock(text) {
-      var container = document.querySelector('#coreui-chart-' + this.getId());
-      if (container && !$(container).find('.coreui-chart-lock')[0]) {
-        $(container).prepend('<div class="coreui-chart-lock">' + '<div class="coreui-chart-message">' + '<div class="spinner-border spinner-border-sm"></div> ' + (text ? '<span>' + text + '</span>' : '') + '</span>' + '</div>');
-      }
-    },
-    /**
-     * Разблокировка
-     */
-    unlock: function unlock() {
-      $('#coreui-chart-' + this.getId() + ' > .coreui-chart-lock').fadeOut(50, function () {
-        $(this).remove();
-      });
-    },
-    /**
-     * Получение данных графика
-     * @param {string} url
-     */
-    loadData: function loadData(url) {
-      this._trigger('load-data.coreui.chart', this, [this]);
-      if (!this._options.options.enabled.hasOwnProperty('preloader') || this._options.options.enabled.preloader === true) {
-        this.lock(this.getLang().loading);
-      }
-      var that = this;
-      $.ajax({
-        url: url,
-        method: 'get',
-        dataType: "json",
-        beforeSend: function beforeSend(xhr) {
-          that._trigger('start-load-data.coreui.chart', that, [that, xhr]);
-        },
-        success: function success(result) {
-          that.clearDatasets();
-          if (result.hasOwnProperty('datasets') && Array.isArray(result.datasets)) {
-            that.addDatasets(result.datasets);
+        if (typeof element === 'string') {
+          var domElement = document.getElementById(element);
+          if (!domElement) {
+            return;
           }
-          that._trigger('success-load-data.coreui.chart', that, [that, result]);
-        },
-        error: function error(xhr, textStatus, errorThrown) {
-          that._trigger('error-load-data.coreui.chart', that, [that, xhr, textStatus, errorThrown]);
-        },
-        complete: function complete(xhr, textStatus) {
-          that.unlock();
-          that._trigger('end-load-data.coreui.chart', that, [that, xhr, textStatus]);
+          this._container = domElement;
+        } else if (element instanceof HTMLElement) {
+          this._container = element;
         }
-      });
-    },
-    /**
-     * Добавление новых наборов
-     * @param {Array} datasets
-     */
-    addDatasets: function addDatasets(datasets) {
-      if (this._typeInstance && typeof this._typeInstance.addDatasets === 'function') {
-        this._typeInstance.addDatasets(datasets);
+        if (this._container) {
+          $(this._container).append(container);
+          this._container = document.querySelector('#coreui-chart-' + this.getId() + ' > .coreui-chart-container');
+        }
+        this.initEvents();
       }
-    },
-    /**
-     * Добавление данных в указанный набор
-     * @param {object} datasets
-     */
-    appendDataset: function appendDataset(datasets) {
-      if (this._typeInstance && typeof this._typeInstance.appendDataset === 'function') {
-        this._typeInstance.appendDataset(datasets);
-      }
-    },
-    /**
-     * Удаление набора данных по имени
-     * @param {string} name
-     */
-    removeDataset: function removeDataset(name) {
-      if (this._typeInstance && typeof this._typeInstance.removeDataset === 'function') {
-        this._typeInstance.removeDataset(name);
-      }
-    },
-    /**
-     * Удаление всех наборов данных
-     */
-    clearDatasets: function clearDatasets() {
-      if (this._typeInstance && typeof this._typeInstance.clearDatasets === 'function') {
-        this._typeInstance.clearDatasets();
-      }
-    },
-    /**
-     * Получение всех наборов данных
-     * @returns {Array}
-     */
-    getDatasets: function getDatasets() {
-      var datasets = [];
-      if (this._typeInstance && typeof this._typeInstance.getDatasets === 'function') {
-        datasets = this._typeInstance.getDatasets();
-      }
-      return datasets;
-    },
-    /**
-     * Получение экземпляра набора данных
-     * @param {string} name
-     * @returns {object|null}
-     */
-    getDataset: function getDataset(name) {
-      var dataset = null;
-      if (this._typeInstance && typeof this._typeInstance.getDataset === 'function') {
-        dataset = this._typeInstance.getDataset(name);
-      }
-      return dataset;
-    },
-    /**
-     * Получение всех аннотаций
-     * @returns {Array}
-     */
-    getAnnotations: function getAnnotations() {
-      var annotations = {};
-      if (this._typeInstance && typeof this._typeInstance.getAnnotations === 'function') {
-        annotations = this._typeInstance.getAnnotations();
-      }
-      return annotations;
-    },
-    /**
-     * Получение аннотации
-     * @param {string} annotationId
-     * @returns {object|null}
-     */
-    getAnnotation: function getAnnotation(annotationId) {
-      var annotation = null;
-      if (this._typeInstance && typeof this._typeInstance.getAnnotation === 'function') {
-        annotation = this._typeInstance.getAnnotation(annotationId);
-      }
-      return annotation;
-    },
-    /**
-     * Добавление аннотации
-     * @param {object} annotation
-     * @returns {string|null}
-     */
-    addAnnotation: function addAnnotation(annotation) {
-      var annotationId = null;
-      if (this._typeInstance && typeof this._typeInstance.addAnnotation === 'function') {
-        annotationId = this._typeInstance.addAnnotation(annotation);
-      }
-      return annotationId;
-    },
-    /**
-     * Удаление аннотации
-     * @param {string} annotationId
-     * @returns {object}
-     */
-    removeAnnotation: function removeAnnotation(annotationId) {
-      if (this._typeInstance && typeof this._typeInstance.removeAnnotation === 'function') {
-        this._typeInstance.removeAnnotation(annotationId);
-      }
-    },
-    /**
-     * Удаление всех аннотаций
-     */
-    clearAnnotations: function clearAnnotations() {
-      if (this._typeInstance && typeof this._typeInstance.clearAnnotations === 'function') {
-        this._typeInstance.clearAnnotations();
-      }
-    },
-    /**
-     * Изменение масштаба на графике
-     * @param {string|numeric} start
-     * @param {string|numeric} end
-     */
-    zoomX: function zoomX(start, end) {
-      this._apex.zoomX(start, end);
-    },
-    /**
-     * Регистрация функции вызываемой при наступлении указанного события
-     * @param eventName
-     * @param callback
-     * @param context
-     * @param singleExec
-     */
-    on: function on(eventName, callback, context, singleExec) {
-      if (_typeof(this._events[eventName]) !== 'object') {
-        this._events[eventName] = [];
-      }
-      this._events[eventName].push({
-        context: context || this,
-        callback: callback,
-        singleExec: !!singleExec
-      });
-    },
-    /**
-     * Уничтожение графика
-     */
-    destruct: function destruct() {
-      this._apex.destroy();
-      delete coreuiChartUtils._instances[this.getId()];
-    },
-    /**
-     * Получение настроек языка
-     * @private
-     */
-    getLang: function getLang() {
-      return $.extend(true, {}, this._options.langList);
-    },
-    /**
-     * @param name
-     * @param context
-     * @param params
-     * @return {object}
-     * @private
-     */
-    _trigger: function _trigger(name, context, params) {
-      params = params || [];
-      var results = [];
-      if (this._events[name] instanceof Object && this._events[name].length > 0) {
-        for (var i = 0; i < this._events[name].length; i++) {
-          var callback = this._events[name][i].callback;
-          context = context || this._events[name][i].context;
-          results.push(callback.apply(context, params));
-          if (this._events[name][i].singleExec) {
-            this._events[name].splice(i, 1);
+
+      /**
+       * Инициализация событий компонента
+       */
+    }, {
+      key: "initEvents",
+      value: function initEvents() {
+        if (!this._container) {
+          this._container = document.querySelector('#coreui-chart-' + this.getId() + ' > .coreui-chart-container');
+        }
+        if (this._container) {
+          var type = this._getTypeChart();
+          if (!this._chartWrapper.type.hasOwnProperty(type)) {
+            console.error('Chart type not found: ' + type);
+            return;
           }
+          var apexOptions = {};
+          if (this._options.hasOwnProperty('custom') && ChartUtils.isObject(this._options.custom)) {
+            apexOptions = this._options.custom;
+          } else {
+            apexOptions = this._convertToApex(this._options);
+          }
+          var colorScheme = 'classic';
+          var schemeColors = [];
+          if (this._options.options.hasOwnProperty('theme') && ChartUtils.isObject(this._options.options.theme) && this._options.options.theme.hasOwnProperty('colorScheme') && typeof this._options.options.theme.colorScheme === 'string') {
+            colorScheme = this._options.options.theme.colorScheme;
+          }
+          if (colorScheme === 'custom' && this._options.options.theme.hasOwnProperty('customColors') && Array.isArray(this._options.options.theme.customColors)) {
+            schemeColors = this._options.options.theme.customColors;
+          } else {
+            schemeColors = this._getColors(colorScheme);
+          }
+          this._typeInstance = $.extend(true, {}, this._chartWrapper.type[type]);
+          this._typeInstance.init(this._options, apexOptions, schemeColors);
+          this._apex = this._typeInstance.render(this._container);
+          if (this._options.options.hasOwnProperty('dataUrl') && typeof this._options.options.dataUrl === 'string' && this._options.options.dataUrl) {
+            this.loadData(this._options.options.dataUrl);
+          }
+          this._trigger('shown.coreui.chart');
         }
       }
-      return results;
-    },
-    /**
-     * Сборка опций для библиотеки apex
-     * @param {object} chart
-     * @private
-     */
-    _convertToApex: function _convertToApex(chart) {
-      var that = this;
-      var apexOptions = {
-        series: [],
-        annotations: {
-          yaxis: [],
-          xaxis: [],
-          points: []
-        },
-        theme: {
-          mode: 'light',
-          palette: 'palette1',
-          monochrome: {
-            enabled: false,
-            color: '#255aee',
-            shadeTo: 'light',
-            shadeIntensity: 0.65
-          }
-        },
-        chart: {
-          sparkline: {
-            enabled: false
+
+      /**
+       * Получение id графика
+       * @return {string|null}
+       */
+    }, {
+      key: "getId",
+      value: function getId() {
+        return this._id;
+      }
+
+      /**
+       * Получение параметров
+       * @returns {object}
+       */
+    }, {
+      key: "getOptions",
+      value: function getOptions() {
+        return $.extend(true, {}, this._options);
+      }
+
+      /**
+       * Блокировка
+       * @param {string} text
+       */
+    }, {
+      key: "lock",
+      value: function lock(text) {
+        var container = document.querySelector('#coreui-chart-' + this.getId());
+        if (container && !$(container).find('.coreui-chart-lock')[0]) {
+          $(container).prepend('<div class="coreui-chart-lock">' + '<div class="coreui-chart-message">' + '<div class="spinner-border spinner-border-sm"></div> ' + (text ? '<span>' + text + '</span>' : '') + '</span>' + '</div>');
+        }
+      }
+
+      /**
+       * Разблокировка
+       */
+    }, {
+      key: "unlock",
+      value: function unlock() {
+        $('#coreui-chart-' + this.getId() + ' > .coreui-chart-lock').fadeOut(50, function () {
+          $(this).remove();
+        });
+      }
+
+      /**
+       * Получение данных графика
+       * @param {string} url
+       */
+    }, {
+      key: "loadData",
+      value: function loadData(url) {
+        this._trigger('load-data.coreui.chart', this, [this]);
+        if (!this._options.options.enabled.hasOwnProperty('preloader') || this._options.options.enabled.preloader === true) {
+          this.lock(this.getLang().loading);
+        }
+        var that = this;
+        $.ajax({
+          url: url,
+          method: 'get',
+          dataType: "json",
+          beforeSend: function beforeSend(xhr) {
+            that._trigger('start-load-data.coreui.chart', that, [that, xhr]);
           },
-          zoom: {
-            enabled: false
-          },
-          animations: {
-            enabled: false
-          },
-          toolbar: {
-            show: false,
-            tools: {
-              zoom: true,
-              zoomin: true,
-              zoomout: true,
-              pan: false,
-              reset: false
+          success: function success(result) {
+            that.clearDatasets();
+            if (result.hasOwnProperty('datasets') && Array.isArray(result.datasets)) {
+              that.addDatasets(result.datasets);
             }
+            that._trigger('success-load-data.coreui.chart', that, [that, result]);
           },
-          events: {
-            mouseMove: function mouseMove(event, chartContext, config) {
-              if (!config.globals.tooltip.hasOwnProperty('tooltipRect')) {
-                return;
-              }
-              var seriesBound = config.globals.dom.elWrap.getBoundingClientRect();
-              var x = config.globals.clientX - seriesBound.left - config.globals.tooltip.tooltipRect.ttWidth / 2;
-              var y = config.globals.clientY - seriesBound.top - config.globals.tooltip.tooltipRect.ttHeight / 2;
-              var tooltip = chartContext.el.querySelector('#apexcharts' + config.globals.chartID + ' > .apexcharts-tooltip');
-              if (x > config.globals.gridWidth / 2) {
-                tooltip.classList.add("apexcharts-tooltip-left");
-                tooltip.classList.remove("apexcharts-tooltip-right");
-              } else {
-                tooltip.classList.remove("apexcharts-tooltip-left");
-                tooltip.classList.add("apexcharts-tooltip-right");
-              }
-              if (y > config.globals.gridHeight / 3.3) {
-                tooltip.classList.add("apexcharts-tooltip-top");
-                tooltip.classList.remove("apexcharts-tooltip-bottom");
-              } else {
-                tooltip.classList.remove("apexcharts-tooltip-top");
-                tooltip.classList.add("apexcharts-tooltip-bottom");
-              }
+          error: function error(xhr, textStatus, errorThrown) {
+            that._trigger('error-load-data.coreui.chart', that, [that, xhr, textStatus, errorThrown]);
+          },
+          complete: function complete(xhr, textStatus) {
+            that.unlock();
+            that._trigger('end-load-data.coreui.chart', that, [that, xhr, textStatus]);
+          }
+        });
+      }
+
+      /**
+       * Добавление новых наборов
+       * @param {Array} datasets
+       */
+    }, {
+      key: "addDatasets",
+      value: function addDatasets(datasets) {
+        if (this._typeInstance && typeof this._typeInstance.addDatasets === 'function') {
+          this._typeInstance.addDatasets(datasets);
+        }
+      }
+
+      /**
+       * Добавление данных в указанный набор
+       * @param {object} datasets
+       */
+    }, {
+      key: "appendDataset",
+      value: function appendDataset(datasets) {
+        if (this._typeInstance && typeof this._typeInstance.appendDataset === 'function') {
+          this._typeInstance.appendDataset(datasets);
+        }
+      }
+
+      /**
+       * Удаление набора данных по имени
+       * @param {string} name
+       */
+    }, {
+      key: "removeDataset",
+      value: function removeDataset(name) {
+        if (this._typeInstance && typeof this._typeInstance.removeDataset === 'function') {
+          this._typeInstance.removeDataset(name);
+        }
+      }
+
+      /**
+       * Удаление всех наборов данных
+       */
+    }, {
+      key: "clearDatasets",
+      value: function clearDatasets() {
+        if (this._typeInstance && typeof this._typeInstance.clearDatasets === 'function') {
+          this._typeInstance.clearDatasets();
+        }
+      }
+
+      /**
+       * Получение всех наборов данных
+       * @returns {Array}
+       */
+    }, {
+      key: "getDatasets",
+      value: function getDatasets() {
+        var datasets = [];
+        if (this._typeInstance && typeof this._typeInstance.getDatasets === 'function') {
+          datasets = this._typeInstance.getDatasets();
+        }
+        return datasets;
+      }
+
+      /**
+       * Получение экземпляра набора данных
+       * @param {string} name
+       * @returns {object|null}
+       */
+    }, {
+      key: "getDataset",
+      value: function getDataset(name) {
+        var dataset = null;
+        if (this._typeInstance && typeof this._typeInstance.getDataset === 'function') {
+          dataset = this._typeInstance.getDataset(name);
+        }
+        return dataset;
+      }
+
+      /**
+       * Получение всех аннотаций
+       * @returns {Array}
+       */
+    }, {
+      key: "getAnnotations",
+      value: function getAnnotations() {
+        var annotations = {};
+        if (this._typeInstance && typeof this._typeInstance.getAnnotations === 'function') {
+          annotations = this._typeInstance.getAnnotations();
+        }
+        return annotations;
+      }
+
+      /**
+       * Получение аннотации
+       * @param {string} annotationId
+       * @returns {object|null}
+       */
+    }, {
+      key: "getAnnotation",
+      value: function getAnnotation(annotationId) {
+        var annotation = null;
+        if (this._typeInstance && typeof this._typeInstance.getAnnotation === 'function') {
+          annotation = this._typeInstance.getAnnotation(annotationId);
+        }
+        return annotation;
+      }
+
+      /**
+       * Добавление аннотации
+       * @param {object} annotation
+       * @returns {string|null}
+       */
+    }, {
+      key: "addAnnotation",
+      value: function addAnnotation(annotation) {
+        var annotationId = null;
+        if (this._typeInstance && typeof this._typeInstance.addAnnotation === 'function') {
+          annotationId = this._typeInstance.addAnnotation(annotation);
+        }
+        return annotationId;
+      }
+
+      /**
+       * Удаление аннотации
+       * @param {string} annotationId
+       * @returns {object}
+       */
+    }, {
+      key: "removeAnnotation",
+      value: function removeAnnotation(annotationId) {
+        if (this._typeInstance && typeof this._typeInstance.removeAnnotation === 'function') {
+          this._typeInstance.removeAnnotation(annotationId);
+        }
+      }
+
+      /**
+       * Удаление всех аннотаций
+       */
+    }, {
+      key: "clearAnnotations",
+      value: function clearAnnotations() {
+        if (this._typeInstance && typeof this._typeInstance.clearAnnotations === 'function') {
+          this._typeInstance.clearAnnotations();
+        }
+      }
+
+      /**
+       * Изменение масштаба на графике
+       * @param {string|numeric} start
+       * @param {string|numeric} end
+       */
+    }, {
+      key: "zoomX",
+      value: function zoomX(start, end) {
+        this._apex.zoomX(start, end);
+      }
+
+      /**
+       * Регистрация функции вызываемой при наступлении указанного события
+       * @param eventName
+       * @param callback
+       * @param context
+       * @param singleExec
+       */
+    }, {
+      key: "on",
+      value: function on(eventName, callback, context, singleExec) {
+        if (_typeof(this._events[eventName]) !== 'object') {
+          this._events[eventName] = [];
+        }
+        this._events[eventName].push({
+          context: context || this,
+          callback: callback,
+          singleExec: !!singleExec
+        });
+      }
+
+      /**
+       * Уничтожение графика
+       */
+    }, {
+      key: "destruct",
+      value: function destruct() {
+        this._apex.destroy();
+        delete Chart._instances[this.getId()];
+      }
+
+      /**
+       * Получение настроек языка
+       * @private
+       */
+    }, {
+      key: "getLang",
+      value: function getLang() {
+        return $.extend(true, {}, this._options.langList);
+      }
+
+      /**
+       * @param name
+       * @param context
+       * @param params
+       * @return {object}
+       * @private
+       */
+    }, {
+      key: "_trigger",
+      value: function _trigger(name, context, params) {
+        params = params || [];
+        var results = [];
+        if (this._events[name] instanceof Object && this._events[name].length > 0) {
+          for (var i = 0; i < this._events[name].length; i++) {
+            var callback = this._events[name][i].callback;
+            context = context || this._events[name][i].context;
+            results.push(callback.apply(context, params));
+            if (this._events[name][i].singleExec) {
+              this._events[name].splice(i, 1);
             }
           }
-        },
-        title: {
-          text: undefined,
-          align: 'left',
-          style: {
-            fontSize: '14px',
-            fontWeight: 'bold',
-            fontFamily: '"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"',
-            color: '#333'
-          }
-        },
-        subtitle: {
-          text: undefined,
-          align: 'left',
-          margin: 5,
-          style: {
-            fontSize: '12px',
-            fontWeight: 'normal',
-            fontFamily: '"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"',
-            color: '#666'
-          }
-        },
-        stroke: {
-          width: [],
-          curve: [],
-          dashArray: []
-        },
-        legend: {
-          show: true,
-          position: 'bottom',
-          horizontalAlign: 'left',
-          markers: {
-            width: 12,
-            height: 4,
-            radius: 1,
-            onClick: undefined,
-            offsetY: -2
-          }
-        },
-        markers: {
-          size: [],
-          strokeWidth: 1,
-          strokeOpacity: 0.5,
-          shape: 'circle',
-          hover: {
-            size: 5,
-            sizeOffset: 5
-          }
-        },
-        dataLabels: {
-          enabled: false,
-          enabledOnSeries: [],
-          style: {
-            colors: []
-          }
-        },
-        fill: {
-          type: [],
-          opacity: [],
-          gradient: {
-            type: "vertical",
-            shadeIntensity: 0,
-            inverseColors: false,
-            opacityFrom: [],
-            opacityTo: 0,
-            stops: [40, 100, 100, 100]
-          }
-        },
-        plotOptions: {
-          bar: {
-            borderRadius: 0,
-            horizontal: false,
-            columnWidth: '70%',
-            barHeight: '70%',
-            dataLabels: {
-              total: {
-                enabled: false
-              }
+        }
+        return results;
+      }
+
+      /**
+       * Сборка опций для библиотеки apex
+       * @param {object} chart
+       * @private
+       */
+    }, {
+      key: "_convertToApex",
+      value: function _convertToApex(chart) {
+        var that = this;
+        var apexOptions = {
+          series: [],
+          annotations: {
+            yaxis: [],
+            xaxis: [],
+            points: []
+          },
+          theme: {
+            mode: 'light',
+            palette: 'palette1',
+            monochrome: {
+              enabled: false,
+              color: '#255aee',
+              shadeTo: 'light',
+              shadeIntensity: 0.65
             }
           },
-          pie: {
-            startAngle: 0,
-            endAngle: 360,
-            donut: {
-              size: '65%',
-              labels: {
-                value: {
-                  show: false
-                },
-                total: {
-                  show: false,
-                  showAlways: false,
-                  label: 'Total'
+          chart: {
+            sparkline: {
+              enabled: false
+            },
+            zoom: {
+              enabled: false
+            },
+            animations: {
+              enabled: false
+            },
+            toolbar: {
+              show: false,
+              tools: {
+                zoom: true,
+                zoomin: true,
+                zoomout: true,
+                pan: false,
+                reset: false
+              }
+            },
+            events: {
+              mouseMove: function mouseMove(event, chartContext, config) {
+                if (!config.globals.tooltip.hasOwnProperty('tooltipRect')) {
+                  return;
+                }
+                var seriesBound = config.globals.dom.elWrap.getBoundingClientRect();
+                var x = config.globals.clientX - seriesBound.left - config.globals.tooltip.tooltipRect.ttWidth / 2;
+                var y = config.globals.clientY - seriesBound.top - config.globals.tooltip.tooltipRect.ttHeight / 2;
+                var tooltip = chartContext.el.querySelector('#apexcharts' + config.globals.chartID + ' > .apexcharts-tooltip');
+                if (x > config.globals.gridWidth / 2) {
+                  tooltip.classList.add("apexcharts-tooltip-left");
+                  tooltip.classList.remove("apexcharts-tooltip-right");
+                } else {
+                  tooltip.classList.remove("apexcharts-tooltip-left");
+                  tooltip.classList.add("apexcharts-tooltip-right");
+                }
+                if (y > config.globals.gridHeight / 3.3) {
+                  tooltip.classList.add("apexcharts-tooltip-top");
+                  tooltip.classList.remove("apexcharts-tooltip-bottom");
+                } else {
+                  tooltip.classList.remove("apexcharts-tooltip-top");
+                  tooltip.classList.add("apexcharts-tooltip-bottom");
                 }
               }
             }
           },
-          radialBar: {
-            startAngle: 0,
-            endAngle: 360,
-            hollow: {
-              size: '40%'
-            },
-            track: {
-              show: true,
-              background: '#f2f2f2',
-              dropShadow: {
-                enabled: false,
-                top: 0,
-                left: 0,
-                blur: 3,
-                opacity: 0.15
+          title: {
+            text: undefined,
+            align: 'left',
+            style: {
+              fontSize: '14px',
+              fontWeight: 'bold',
+              fontFamily: '"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"',
+              color: '#333'
+            }
+          },
+          subtitle: {
+            text: undefined,
+            align: 'left',
+            margin: 5,
+            style: {
+              fontSize: '12px',
+              fontWeight: 'normal',
+              fontFamily: '"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"',
+              color: '#666'
+            }
+          },
+          stroke: {
+            width: [],
+            curve: [],
+            dashArray: []
+          },
+          legend: {
+            show: true,
+            position: 'bottom',
+            horizontalAlign: 'left',
+            markers: {
+              width: 12,
+              height: 4,
+              radius: 1,
+              onClick: undefined,
+              offsetY: -2
+            }
+          },
+          markers: {
+            size: [],
+            strokeWidth: 1,
+            strokeOpacity: 0.5,
+            shape: 'circle',
+            hover: {
+              size: 5,
+              sizeOffset: 5
+            }
+          },
+          dataLabels: {
+            enabled: false,
+            enabledOnSeries: [],
+            style: {
+              colors: []
+            }
+          },
+          fill: {
+            type: [],
+            opacity: [],
+            gradient: {
+              type: "vertical",
+              shadeIntensity: 0,
+              inverseColors: false,
+              opacityFrom: [],
+              opacityTo: 0,
+              stops: [40, 100, 100, 100]
+            }
+          },
+          plotOptions: {
+            bar: {
+              borderRadius: 0,
+              horizontal: false,
+              columnWidth: '70%',
+              barHeight: '70%',
+              dataLabels: {
+                total: {
+                  enabled: false
+                }
               }
             },
-            dataLabels: {
-              name: {
-                offsetY: undefined
+            pie: {
+              startAngle: 0,
+              endAngle: 360,
+              donut: {
+                size: '65%',
+                labels: {
+                  value: {
+                    show: false
+                  },
+                  total: {
+                    show: false,
+                    showAlways: false,
+                    label: 'Total'
+                  }
+                }
+              }
+            },
+            radialBar: {
+              startAngle: 0,
+              endAngle: 360,
+              hollow: {
+                size: '40%'
               },
-              value: {
-                show: false,
-                fontSize: '22px',
-                offsetY: undefined
+              track: {
+                show: true,
+                background: '#f2f2f2',
+                dropShadow: {
+                  enabled: false,
+                  top: 0,
+                  left: 0,
+                  blur: 3,
+                  opacity: 0.15
+                }
               },
-              total: {
-                show: false,
-                showAlways: false,
-                label: 'Total',
-                fontSize: '16px',
-                fontWeight: 400
+              dataLabels: {
+                name: {
+                  offsetY: undefined
+                },
+                value: {
+                  show: false,
+                  fontSize: '22px',
+                  offsetY: undefined
+                },
+                total: {
+                  show: false,
+                  showAlways: false,
+                  label: 'Total',
+                  fontSize: '16px',
+                  fontWeight: 400
+                }
               }
-            }
-          },
-          candlestick: {
-            colors: {
-              upward: '#00B746',
-              downward: '#EF403C'
             },
-            wick: {
-              useFillColor: true
-            }
-          },
-          boxPlot: {
-            colors: {
-              upper: '#5C4742',
-              lower: '#A5978B'
-            }
-          }
-        },
-        colors: [],
-        tooltip: {
-          enabled: true,
-          followCursor: true,
-          shared: true,
-          intersect: false,
-          style: {
-            fontSize: '12px'
-          },
-          x: {
-            formatter: function formatter(val) {
-              if (typeof val === 'string') {
-                return val;
+            candlestick: {
+              colors: {
+                upward: '#00B746',
+                downward: '#EF403C'
+              },
+              wick: {
+                useFillColor: true
               }
-              if (this) {
-                return this.hasOwnProperty('categoryLabels') && this.categoryLabels.hasOwnProperty(val - 1) && this.categoryLabels[val - 1] !== undefined ? this.categoryLabels[val - 1] : null;
+            },
+            boxPlot: {
+              colors: {
+                upper: '#5C4742',
+                lower: '#A5978B'
               }
             }
           },
-          y: {
-            formatter: undefined
-          }
-        },
-        grid: {
-          show: true,
-          borderColor: '#f5f5f5',
-          strokeDashArray: 0,
-          xaxis: {
-            lines: {
-              show: true
+          colors: [],
+          tooltip: {
+            enabled: true,
+            followCursor: true,
+            shared: true,
+            intersect: false,
+            style: {
+              fontSize: '12px'
+            },
+            x: {
+              formatter: function formatter(val) {
+                if (typeof val === 'string') {
+                  return val;
+                }
+                if (this) {
+                  return this.hasOwnProperty('categoryLabels') && this.categoryLabels.hasOwnProperty(val - 1) && this.categoryLabels[val - 1] !== undefined ? this.categoryLabels[val - 1] : null;
+                }
+              }
+            },
+            y: {
+              formatter: undefined
+            }
+          },
+          grid: {
+            show: true,
+            borderColor: '#f5f5f5',
+            strokeDashArray: 0,
+            xaxis: {
+              lines: {
+                show: true
+              }
+            },
+            yaxis: {
+              lines: {
+                show: true
+              }
             }
           },
           yaxis: {
-            lines: {
-              show: true
-            }
-          }
-        },
-        yaxis: {
-          opposite: false,
-          logarithmic: false,
-          logBase: 10,
-          tooltip: {
-            enabled: false
-          },
-          axisBorder: {
-            show: false,
-            color: '#78909C'
-          },
-          axisTicks: {
-            show: false,
-            borderType: 'solid',
-            color: '#78909C',
-            width: 6,
-            offsetX: 0,
-            offsetY: 0
-          },
-          title: {
-            text: undefined,
-            style: {
+            opposite: false,
+            logarithmic: false,
+            logBase: 10,
+            tooltip: {
+              enabled: false
+            },
+            axisBorder: {
+              show: false,
+              color: '#78909C'
+            },
+            axisTicks: {
+              show: false,
+              borderType: 'solid',
               color: '#78909C',
-              fontSize: '12px',
-              fontFamily: 'Helvetica, Arial, sans-serif',
-              fontWeight: 600,
-              cssClass: 'apexcharts-yaxis-title'
+              width: 6,
+              offsetX: 0,
+              offsetY: 0
+            },
+            title: {
+              text: undefined,
+              style: {
+                color: '#78909C',
+                fontSize: '12px',
+                fontFamily: 'Helvetica, Arial, sans-serif',
+                fontWeight: 600,
+                cssClass: 'apexcharts-yaxis-title'
+              }
+            },
+            labels: {
+              style: {
+                colors: '#78909C'
+              }
             }
           },
-          labels: {
-            style: {
-              colors: '#78909C'
-            }
-          }
-        },
-        xaxis: {
-          type: 'category',
-          categories: [],
-          tooltip: {
-            enabled: false
-          },
-          axisBorder: {
-            show: false,
-            color: '#78909C'
-          },
-          axisTicks: {
-            show: false,
-            borderType: 'solid',
-            color: '#78909C',
-            width: 6,
-            offsetX: 0,
-            offsetY: 0
-          },
-          title: {
-            text: undefined,
-            style: {
+          xaxis: {
+            type: 'category',
+            categories: [],
+            tooltip: {
+              enabled: false
+            },
+            axisBorder: {
+              show: false,
+              color: '#78909C'
+            },
+            axisTicks: {
+              show: false,
+              borderType: 'solid',
               color: '#78909C',
-              fontSize: '12px',
-              fontFamily: 'Helvetica, Arial, sans-serif',
-              fontWeight: 600,
-              cssClass: 'apexcharts-yaxis-title'
-            }
-          },
-          labels: {
-            style: {
-              colors: '#78909C'
-            }
-          },
-          crosshairs: {
-            show: true,
-            width: 1,
-            position: 'back',
-            opacity: 1,
-            stroke: {
-              color: '#666',
+              width: 6,
+              offsetX: 0,
+              offsetY: 0
+            },
+            title: {
+              text: undefined,
+              style: {
+                color: '#78909C',
+                fontSize: '12px',
+                fontFamily: 'Helvetica, Arial, sans-serif',
+                fontWeight: 600,
+                cssClass: 'apexcharts-yaxis-title'
+              }
+            },
+            labels: {
+              style: {
+                colors: '#78909C'
+              }
+            },
+            crosshairs: {
+              show: true,
               width: 1,
-              dashArray: 3
-            }
-          }
-        }
-      };
-      if (chart.hasOwnProperty('labels') && coreuiChartUtils.isArray(chart.labels)) {
-        apexOptions.labels = chart.labels;
-      }
-      if (chart.hasOwnProperty('options') && coreuiChartUtils.isObject(chart.options)) {
-        if (chart.options.hasOwnProperty('lang')) {
-          apexOptions.chart.defaultLocale = chart.options.lang;
-          apexOptions.chart.locales = [{
-            name: chart.options.lang,
-            options: this.getLang()
-          }];
-        }
-        if (chart.options.hasOwnProperty('width') && ['string', 'number'].indexOf(_typeof(chart.options.width)) >= 0) {
-          apexOptions.chart.width = chart.options.width;
-        }
-        if (chart.options.hasOwnProperty('height') && ['string', 'number'].indexOf(_typeof(chart.options.height)) >= 0) {
-          apexOptions.chart.height = chart.options.height;
-        }
-
-        // Title
-        if (chart.options.hasOwnProperty('title') && coreuiChartUtils.isObject(chart.options.title)) {
-          that._setOptionsTitle(apexOptions, chart.options.title);
-        }
-
-        // Legend
-        if (chart.options.hasOwnProperty('legend') && coreuiChartUtils.isObject(chart.options.legend)) {
-          var title = chart.options.hasOwnProperty('title') ? chart.options.title : {};
-          that._setOptionsLegend(apexOptions, chart.options.legend, title);
-        }
-
-        // Enabled
-        if (chart.options.hasOwnProperty('enabled') && coreuiChartUtils.isObject(chart.options.enabled)) {
-          that._setOptionsEnabled(apexOptions, chart.options.enabled);
-        }
-
-        // Tooltip
-        if (chart.options.hasOwnProperty('tooltip') && coreuiChartUtils.isObject(chart.options.tooltip)) {
-          that._setOptionsTooltip(apexOptions, chart.options.tooltip);
-        }
-
-        // Axis
-        if (chart.options.hasOwnProperty('axis') && coreuiChartUtils.isObject(chart.options.axis)) {
-          that._setOptionsAxis(apexOptions, chart.options.axis);
-        }
-
-        // theme
-        if (chart.options.hasOwnProperty('theme') && coreuiChartUtils.isObject(chart.options.theme)) {
-          that._setOptionsTheme(apexOptions, chart.options.theme);
-        }
-
-        // Events
-        if (chart.options.hasOwnProperty('events') && coreuiChartUtils.isObject(chart.options.events)) {
-          if (chart.options.events.hasOwnProperty('markerClick')) {
-            if (typeof chart.options.events.markerClick === 'function') {
-              apexOptions.chart.events.markerClick = function (event, chartContext, marker) {
-                chart.options.events.markerClick(event, chartContext, marker);
-              };
-            } else if (typeof chart.options.events.markerClick === 'string') {
-              var func = coreuiChartUtils.getFunctionByName(chart.options.events.markerClick);
-              if (typeof func === 'function') {
-                apexOptions.chart.events.markerClick = func;
+              position: 'back',
+              opacity: 1,
+              stroke: {
+                color: '#666',
+                width: 1,
+                dashArray: 3
               }
             }
           }
-          if (chart.options.events.hasOwnProperty('legendClick')) {
-            if (typeof chart.options.events.legendClick === 'function') {
-              apexOptions.chart.events.legendClick = function (chartContext, seriesIndex) {
-                chart.options.events.legendClick(chartContext, seriesIndex);
-              };
-            } else if (typeof chart.options.events.legendClick === 'string') {
-              var _func = coreuiChartUtils.getFunctionByName(chart.options.events.legendClick);
-              if (typeof _func === 'function') {
-                apexOptions.chart.events.legendClick = _func;
-              }
-            }
-          }
-          if (chart.options.events.hasOwnProperty('zoomed')) {
-            if (typeof chart.options.events.zoomed === 'function') {
-              apexOptions.chart.events.zoomed = function (chartContext, axis) {
-                chart.options.events.zoomed(chartContext, axis);
-              };
-            } else if (typeof chart.options.events.zoomed === 'string') {
-              var _func2 = coreuiChartUtils.getFunctionByName(chart.options.events.zoomed);
-              if (typeof _func2 === 'function') {
-                apexOptions.chart.events.zoomed = _func2;
-              }
-            }
-          }
-        }
-      }
-      return apexOptions;
-    },
-    /**
-     * Определение типа графика
-     * @return {*}
-     * @private
-     */
-    _getTypeChart: function _getTypeChart() {
-      var type = this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('type') && typeof this._options.options.type === 'string' ? this._options.options.type : 'line';
-      if (['line', 'hBar', 'pie', 'radar', 'rangeArea', 'rangeBar', 'polarArea', 'candlestick', 'box'].indexOf(type) <= 0) {
-        type = 'line';
-      } else {
-        type = this._options.options.type;
-      }
-      return type;
-    },
-    /**
-     * Получение набора цветов
-     * @param {string} colorScheme
-     * @private
-     */
-    _getColors: function _getColors(colorScheme) {
-      var colors = null;
-      colorScheme = colorScheme || 'classic';
-
-      // Получение цветов палитры
-      if (colorScheme === 'classic') {
-        colors = coreuiChartUtils.getPaletteClassic();
-      } else {
-        colors = palette(colorScheme, 65);
-
-        // не удалось получить столько цветов
-        if (colors === null) {
-          $.each(palette.listSchemes('all'), function (key, scheme) {
-            if (scheme.scheme_name === colorScheme) {
-              colors = palette(colorScheme, scheme.max);
-              return false;
-            }
-          });
-
-          // Некорректная схема
-          if (colors === null) {
-            colors = coreuiChartUtils.getPaletteClassic();
-          }
-        }
-      }
-      return colors;
-    },
-    /**
-     * Заполнение Options.Title
-     * @param apexOptions
-     * @param title
-     * @private
-     */
-    _setOptionsTitle: function _setOptionsTitle(apexOptions, title) {
-      if (title.hasOwnProperty('text') && typeof title.text === 'string') {
-        apexOptions.title.text = title.text;
-      }
-      if (title.hasOwnProperty('align') && typeof title.align === 'string') {
-        apexOptions.title.align = title.align;
-      }
-      if (title.hasOwnProperty('fontSize') && typeof title.fontSize === 'string') {
-        apexOptions.title.style.fontSize = title.fontSize;
-      }
-      if (title.hasOwnProperty('fontWeight') && typeof title.fontWeight === 'string') {
-        apexOptions.title.style.fontWeight = title.fontWeight;
-      }
-      if (title.hasOwnProperty('fontFamily') && typeof title.fontFamily === 'string') {
-        apexOptions.title.style.fontFamily = title.fontFamily;
-      }
-      if (title.hasOwnProperty('color') && typeof title.color === 'string') {
-        apexOptions.title.style.color = title.color;
-      }
-
-      // Description
-      if (title.hasOwnProperty('description') && coreuiChartUtils.isObject(title.description)) {
-        if (title.description.hasOwnProperty('text') && typeof title.description.text === 'string') {
-          apexOptions.subtitle.text = title.description.text;
-        }
-        if (title.description.hasOwnProperty('align') && typeof title.description.align === 'string') {
-          apexOptions.subtitle.align = title.description.align;
-        }
-        if (title.description.hasOwnProperty('fontSize') && typeof title.description.fontSize === 'string') {
-          apexOptions.subtitle.style.fontSize = title.description.fontSize;
-        }
-        if (title.description.hasOwnProperty('fontWeight') && typeof title.description.fontWeight === 'string') {
-          apexOptions.subtitle.style.fontWeight = title.description.fontWeight;
-        }
-        if (title.description.hasOwnProperty('fontFamily') && typeof title.description.fontFamily === 'string') {
-          apexOptions.subtitle.style.fontFamily = title.description.fontFamily;
-        }
-        if (title.description.hasOwnProperty('color') && typeof title.description.color === 'string') {
-          apexOptions.subtitle.style.color = title.description.color;
-        }
-      }
-    },
-    /**
-     * Заполнение Options.Legend
-     * @param apexOptions
-     * @param legend
-     * @param title
-     * @private
-     */
-    _setOptionsLegend: function _setOptionsLegend(apexOptions, legend, title) {
-      if (legend.hasOwnProperty('position') && typeof legend.position === 'string') {
-        apexOptions.legend.position = legend.position;
-      }
-      if (legend.hasOwnProperty('horizontalAlign') && typeof legend.horizontalAlign === 'string') {
-        apexOptions.legend.horizontalAlign = legend.horizontalAlign;
-        if (['left', 'right'].indexOf(legend.position) >= 0 && coreuiChartUtils.isObject(title) && (title.hasOwnProperty('text') && typeof title.text === 'string' && title.text || title.description.hasOwnProperty('text') && typeof title.description.text === 'string' && title.description.text)) {
-          var offsetY = 0;
-          if (title.hasOwnProperty('text') && typeof title.text === 'string' && title.text) {
-            offsetY += 20;
-          }
-          if (title.description.hasOwnProperty('text') && typeof title.description.text === 'string' && title.description.text) {
-            offsetY += 20;
-          }
-          apexOptions.legend.offsetY = offsetY;
-        } else if (legend.position === 'top') {
-          apexOptions.legend.offsetY = 0;
-        }
-      }
-    },
-    /**
-     * Заполнение Options.Enabled
-     * @param apexOptions
-     * @param enabled
-     * @private
-     */
-    _setOptionsEnabled: function _setOptionsEnabled(apexOptions, enabled) {
-      if (enabled.hasOwnProperty('animations') && typeof enabled.animations === 'boolean') {
-        apexOptions.chart.animations.enabled = enabled.animations;
-      }
-      if (enabled.hasOwnProperty('zoom') && typeof enabled.zoom === 'boolean') {
-        apexOptions.chart.zoom.enabled = enabled.zoom;
-      }
-      if (enabled.hasOwnProperty('toolbar') && typeof enabled.toolbar === 'boolean') {
-        apexOptions.chart.toolbar.show = enabled.toolbar;
-      }
-      if (enabled.hasOwnProperty('minimize') && typeof enabled.minimize === 'boolean') {
-        apexOptions.chart.sparkline.enabled = enabled.minimize;
-      }
-      if (enabled.hasOwnProperty('legend') && typeof enabled.legend === 'boolean') {
-        apexOptions.legend.show = enabled.legend;
-      }
-      if (enabled.hasOwnProperty('labels') && typeof enabled.labels === 'boolean') {
-        apexOptions.dataLabels.enabled = enabled.labels;
-      }
-      if (enabled.hasOwnProperty('tooltip') && typeof enabled.tooltip === 'boolean') {
-        apexOptions.tooltip.enabled = enabled.tooltip;
-      }
-    },
-    /**
-     * Заполнение Options.Tooltip
-     * @param apexOptions
-     * @param tooltip
-     * @private
-     */
-    _setOptionsTooltip: function _setOptionsTooltip(apexOptions, tooltip) {
-      if (tooltip.hasOwnProperty('mode') && typeof tooltip.mode === 'string') {
-        if (tooltip.mode === 'all') {
-          apexOptions.tooltip.shared = true;
-          apexOptions.tooltip.intersect = false;
-        } else if (tooltip.mode === 'single') {
-          apexOptions.tooltip.shared = false;
-          apexOptions.tooltip.intersect = true;
-        }
-      }
-      if (tooltip.hasOwnProperty('formatter')) {
-        if (typeof tooltip.formatter === 'function') {
-          apexOptions.tooltip.y.formatter = tooltip.formatter;
-        } else if (typeof tooltip.formatter === 'string') {
-          var func = coreuiChartUtils.getFunctionByName(tooltip.formatter);
-          if (typeof func === 'function') {
-            apexOptions.tooltip.y.formatter = func;
-          }
-        }
-      } else if (tooltip.hasOwnProperty('valueSuffix') && typeof tooltip.valueSuffix === 'string' || tooltip.hasOwnProperty('valuePrefix') && typeof tooltip.valuePrefix === 'string') {
-        var valueSuffix = '';
-        var valuePrefix = '';
-        if (tooltip.hasOwnProperty('valueSuffix') && typeof tooltip.valueSuffix === 'string') {
-          valueSuffix = tooltip.valueSuffix;
-        }
-        if (tooltip.hasOwnProperty('valuePrefix') && typeof tooltip.valuePrefix === 'string') {
-          valuePrefix = tooltip.valuePrefix;
-        }
-        apexOptions.tooltip.y.formatter = function (val, data) {
-          return valuePrefix + val + valueSuffix;
         };
-      }
-    },
-    /**
-     * Заполнение Options.Styles.Bar
-     * @param apexOptions
-     * @param axis
-     * @private
-     */
-    _setOptionsAxis: function _setOptionsAxis(apexOptions, axis) {
-      // Xaxis
-      if (axis.hasOwnProperty('xaxis') && coreuiChartUtils.isObject(axis.xaxis)) {
-        if (axis.xaxis.hasOwnProperty('show') && typeof axis.xaxis.show === 'boolean') {
-          apexOptions.xaxis.show = axis.xaxis.show;
+        if (chart.hasOwnProperty('labels') && ChartUtils.isArray(chart.labels)) {
+          apexOptions.labels = chart.labels;
         }
-        if (axis.xaxis.hasOwnProperty('title') && typeof axis.xaxis.title === 'string') {
-          apexOptions.xaxis.title.text = axis.xaxis.title;
+        if (chart.hasOwnProperty('options') && ChartUtils.isObject(chart.options)) {
+          if (chart.options.hasOwnProperty('lang')) {
+            apexOptions.chart.defaultLocale = chart.options.lang;
+            apexOptions.chart.locales = [{
+              name: chart.options.lang,
+              options: this.getLang()
+            }];
+          }
+          if (chart.options.hasOwnProperty('width') && ['string', 'number'].indexOf(_typeof(chart.options.width)) >= 0) {
+            apexOptions.chart.width = chart.options.width;
+          }
+          if (chart.options.hasOwnProperty('height') && ['string', 'number'].indexOf(_typeof(chart.options.height)) >= 0) {
+            apexOptions.chart.height = chart.options.height;
+          }
+
+          // Title
+          if (chart.options.hasOwnProperty('title') && ChartUtils.isObject(chart.options.title)) {
+            that._setOptionsTitle(apexOptions, chart.options.title);
+          }
+
+          // Legend
+          if (chart.options.hasOwnProperty('legend') && ChartUtils.isObject(chart.options.legend)) {
+            var title = chart.options.hasOwnProperty('title') ? chart.options.title : {};
+            that._setOptionsLegend(apexOptions, chart.options.legend, title);
+          }
+
+          // Enabled
+          if (chart.options.hasOwnProperty('enabled') && ChartUtils.isObject(chart.options.enabled)) {
+            that._setOptionsEnabled(apexOptions, chart.options.enabled);
+          }
+
+          // Tooltip
+          if (chart.options.hasOwnProperty('tooltip') && ChartUtils.isObject(chart.options.tooltip)) {
+            that._setOptionsTooltip(apexOptions, chart.options.tooltip);
+          }
+
+          // Axis
+          if (chart.options.hasOwnProperty('axis') && ChartUtils.isObject(chart.options.axis)) {
+            that._setOptionsAxis(apexOptions, chart.options.axis);
+          }
+
+          // theme
+          if (chart.options.hasOwnProperty('theme') && ChartUtils.isObject(chart.options.theme)) {
+            that._setOptionsTheme(apexOptions, chart.options.theme);
+          }
+
+          // Events
+          if (chart.options.hasOwnProperty('events') && ChartUtils.isObject(chart.options.events)) {
+            if (chart.options.events.hasOwnProperty('markerClick')) {
+              if (typeof chart.options.events.markerClick === 'function') {
+                apexOptions.chart.events.markerClick = function (event, chartContext, marker) {
+                  chart.options.events.markerClick(event, chartContext, marker);
+                };
+              } else if (typeof chart.options.events.markerClick === 'string') {
+                var func = ChartUtils.getFunctionByName(chart.options.events.markerClick);
+                if (typeof func === 'function') {
+                  apexOptions.chart.events.markerClick = func;
+                }
+              }
+            }
+            if (chart.options.events.hasOwnProperty('legendClick')) {
+              if (typeof chart.options.events.legendClick === 'function') {
+                apexOptions.chart.events.legendClick = function (chartContext, seriesIndex) {
+                  chart.options.events.legendClick(chartContext, seriesIndex);
+                };
+              } else if (typeof chart.options.events.legendClick === 'string') {
+                var _func = ChartUtils.getFunctionByName(chart.options.events.legendClick);
+                if (typeof _func === 'function') {
+                  apexOptions.chart.events.legendClick = _func;
+                }
+              }
+            }
+            if (chart.options.events.hasOwnProperty('zoomed')) {
+              if (typeof chart.options.events.zoomed === 'function') {
+                apexOptions.chart.events.zoomed = function (chartContext, axis) {
+                  chart.options.events.zoomed(chartContext, axis);
+                };
+              } else if (typeof chart.options.events.zoomed === 'string') {
+                var _func2 = ChartUtils.getFunctionByName(chart.options.events.zoomed);
+                if (typeof _func2 === 'function') {
+                  apexOptions.chart.events.zoomed = _func2;
+                }
+              }
+            }
+          }
         }
-        if (axis.xaxis.hasOwnProperty('type') && typeof axis.xaxis.type === 'string') {
-          apexOptions.xaxis.type = axis.xaxis.type;
-        }
-        if (axis.xaxis.hasOwnProperty('position') && typeof axis.xaxis.position === 'string') {
-          apexOptions.xaxis.position = axis.xaxis.position;
-        }
-        if (axis.xaxis.hasOwnProperty('border') && typeof axis.xaxis.border === 'boolean') {
-          apexOptions.xaxis.axisBorder.show = axis.xaxis.border;
-          apexOptions.xaxis.axisTicks.show = axis.xaxis.border;
-        }
-        if (axis.xaxis.hasOwnProperty('color') && typeof axis.xaxis.color === 'string') {
-          apexOptions.xaxis.axisBorder.color = axis.xaxis.color;
-          apexOptions.xaxis.axisTicks.color = axis.xaxis.color;
-          apexOptions.xaxis.title.style.color = axis.xaxis.color;
-          apexOptions.xaxis.labels.style.colors = axis.xaxis.color;
-        }
+        return apexOptions;
       }
 
-      // Yaxis
-      if (axis.hasOwnProperty('yaxis') && coreuiChartUtils.isObject(axis.yaxis)) {
-        if (axis.yaxis.hasOwnProperty('show') && typeof axis.xaxis.show === 'boolean') {
-          apexOptions.yaxis.show = axis.yaxis.show;
-        }
-        if (axis.yaxis.hasOwnProperty('logarithmic') && typeof axis.yaxis.logarithmic === 'boolean') {
-          apexOptions.yaxis.logarithmic = axis.yaxis.logarithmic;
-        }
-        if (axis.yaxis.hasOwnProperty('title') && typeof axis.yaxis.title === 'string') {
-          apexOptions.yaxis.title.text = axis.yaxis.title;
-        }
-        if (axis.yaxis.hasOwnProperty('position') && typeof axis.yaxis.position === 'string') {
-          apexOptions.yaxis.opposite = axis.yaxis.position === 'right';
-        }
-        if (axis.yaxis.hasOwnProperty('logBase') && typeof axis.yaxis.logBase === 'number') {
-          apexOptions.yaxis.logBase = axis.yaxis.logBase;
-        }
-        if (axis.yaxis.hasOwnProperty('min') && typeof axis.yaxis.min === 'number') {
-          apexOptions.yaxis.min = axis.yaxis.min;
-        }
-        if (axis.yaxis.hasOwnProperty('max') && typeof axis.yaxis.max === 'number') {
-          apexOptions.yaxis.max = axis.yaxis.max;
-        }
-        if (axis.yaxis.hasOwnProperty('border') && typeof axis.yaxis.border === 'boolean') {
-          apexOptions.yaxis.axisBorder.show = axis.yaxis.border;
-          apexOptions.yaxis.axisTicks.show = axis.yaxis.border;
-        }
-        if (axis.yaxis.hasOwnProperty('color') && typeof axis.yaxis.color === 'string') {
-          apexOptions.yaxis.axisBorder.color = axis.yaxis.color;
-          apexOptions.yaxis.axisTicks.color = axis.yaxis.color;
-          apexOptions.yaxis.title.style.color = axis.yaxis.color;
-          apexOptions.yaxis.labels.style.colors = axis.yaxis.color;
-        }
-      }
-
-      // Grid
-      if (axis.hasOwnProperty('grid') && coreuiChartUtils.isObject(axis.grid)) {
-        if (axis.grid.hasOwnProperty('show') && typeof axis.grid.show === 'boolean') {
-          apexOptions.grid.show = axis.grid.show;
-        }
-        if (axis.grid.hasOwnProperty('xLines') && typeof axis.grid.xLines === 'boolean') {
-          apexOptions.grid.xaxis.lines.show = axis.grid.xLines;
-        }
-        if (axis.grid.hasOwnProperty('yLines') && typeof axis.grid.yLines === 'boolean') {
-          apexOptions.grid.yaxis.lines.show = axis.grid.yLines;
-        }
-        if (axis.grid.hasOwnProperty('dash') && typeof axis.grid.dash === 'number') {
-          apexOptions.grid.strokeDashArray = axis.grid.dash;
-        }
-        if (axis.grid.hasOwnProperty('color') && typeof axis.grid.color === 'string') {
-          apexOptions.grid.borderColor = axis.grid.color;
-        }
-      }
-    },
-    /**
-     * Заполнение Options.Theme
-     * @param apexOptions
-     * @param theme
-     * @private
-     */
-    _setOptionsTheme: function _setOptionsTheme(apexOptions, theme) {
-      // Theme
-      if (theme.hasOwnProperty('mode') && typeof theme.mode === 'string') {
-        apexOptions.theme.mode = theme.mode;
-      }
-      if (theme.hasOwnProperty('colorScheme') && typeof theme.colorScheme === 'string') {
-        if (theme.colorScheme === 'monochrome') {
-          apexOptions.theme.monochrome.enabled = true;
-          apexOptions.theme.palette = null;
+      /**
+       * Определение типа графика
+       * @return {*}
+       * @private
+       */
+    }, {
+      key: "_getTypeChart",
+      value: function _getTypeChart() {
+        var type = this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('type') && typeof this._options.options.type === 'string' ? this._options.options.type : 'line';
+        if (['line', 'hBar', 'pie', 'radar', 'rangeArea', 'rangeBar', 'polarArea', 'candlestick', 'box'].indexOf(type) <= 0) {
+          type = 'line';
         } else {
-          apexOptions.theme.palette = theme.colorScheme;
+          type = this._options.options.type;
+        }
+        return type;
+      }
+
+      /**
+       * Получение набора цветов
+       * @param {string} colorScheme
+       * @private
+       */
+    }, {
+      key: "_getColors",
+      value: function _getColors(colorScheme) {
+        var colors = null;
+        colorScheme = colorScheme || 'classic';
+
+        // Получение цветов палитры
+        if (colorScheme === 'classic') {
+          colors = ChartUtils.getPaletteClassic();
+        } else {
+          colors = palette(colorScheme, 65);
+
+          // не удалось получить столько цветов
+          if (colors === null) {
+            $.each(palette.listSchemes('all'), function (key, scheme) {
+              if (scheme.scheme_name === colorScheme) {
+                colors = palette(colorScheme, scheme.max);
+                return false;
+              }
+            });
+
+            // Некорректная схема
+            if (colors === null) {
+              colors = ChartUtils.getPaletteClassic();
+            }
+          }
+        }
+        return colors;
+      }
+
+      /**
+       * Заполнение Options.Title
+       * @param apexOptions
+       * @param title
+       * @private
+       */
+    }, {
+      key: "_setOptionsTitle",
+      value: function _setOptionsTitle(apexOptions, title) {
+        if (title.hasOwnProperty('text') && typeof title.text === 'string') {
+          apexOptions.title.text = title.text;
+        }
+        if (title.hasOwnProperty('align') && typeof title.align === 'string') {
+          apexOptions.title.align = title.align;
+        }
+        if (title.hasOwnProperty('fontSize') && typeof title.fontSize === 'string') {
+          apexOptions.title.style.fontSize = title.fontSize;
+        }
+        if (title.hasOwnProperty('fontWeight') && typeof title.fontWeight === 'string') {
+          apexOptions.title.style.fontWeight = title.fontWeight;
+        }
+        if (title.hasOwnProperty('fontFamily') && typeof title.fontFamily === 'string') {
+          apexOptions.title.style.fontFamily = title.fontFamily;
+        }
+        if (title.hasOwnProperty('color') && typeof title.color === 'string') {
+          apexOptions.title.style.color = title.color;
+        }
+
+        // Description
+        if (title.hasOwnProperty('description') && ChartUtils.isObject(title.description)) {
+          if (title.description.hasOwnProperty('text') && typeof title.description.text === 'string') {
+            apexOptions.subtitle.text = title.description.text;
+          }
+          if (title.description.hasOwnProperty('align') && typeof title.description.align === 'string') {
+            apexOptions.subtitle.align = title.description.align;
+          }
+          if (title.description.hasOwnProperty('fontSize') && typeof title.description.fontSize === 'string') {
+            apexOptions.subtitle.style.fontSize = title.description.fontSize;
+          }
+          if (title.description.hasOwnProperty('fontWeight') && typeof title.description.fontWeight === 'string') {
+            apexOptions.subtitle.style.fontWeight = title.description.fontWeight;
+          }
+          if (title.description.hasOwnProperty('fontFamily') && typeof title.description.fontFamily === 'string') {
+            apexOptions.subtitle.style.fontFamily = title.description.fontFamily;
+          }
+          if (title.description.hasOwnProperty('color') && typeof title.description.color === 'string') {
+            apexOptions.subtitle.style.color = title.description.color;
+          }
         }
       }
-      if (theme.hasOwnProperty('monochromeColor') && typeof theme.monochromeColor === 'string') {
-        apexOptions.theme.monochrome.color = theme.monochromeColor;
-      }
-      if (theme.hasOwnProperty('background') && typeof theme.background === 'string') {
-        apexOptions.chart.background = theme.background;
-      }
-    }
-  };
 
-  var coreuiChart = {
+      /**
+       * Заполнение Options.Legend
+       * @param apexOptions
+       * @param legend
+       * @param title
+       * @private
+       */
+    }, {
+      key: "_setOptionsLegend",
+      value: function _setOptionsLegend(apexOptions, legend, title) {
+        if (legend.hasOwnProperty('position') && typeof legend.position === 'string') {
+          apexOptions.legend.position = legend.position;
+        }
+        if (legend.hasOwnProperty('horizontalAlign') && typeof legend.horizontalAlign === 'string') {
+          apexOptions.legend.horizontalAlign = legend.horizontalAlign;
+          if (['left', 'right'].indexOf(legend.position) >= 0 && ChartUtils.isObject(title) && (title.hasOwnProperty('text') && typeof title.text === 'string' && title.text || title.description.hasOwnProperty('text') && typeof title.description.text === 'string' && title.description.text)) {
+            var offsetY = 0;
+            if (title.hasOwnProperty('text') && typeof title.text === 'string' && title.text) {
+              offsetY += 20;
+            }
+            if (title.description.hasOwnProperty('text') && typeof title.description.text === 'string' && title.description.text) {
+              offsetY += 20;
+            }
+            apexOptions.legend.offsetY = offsetY;
+          } else if (legend.position === 'top') {
+            apexOptions.legend.offsetY = 0;
+          }
+        }
+      }
+
+      /**
+       * Заполнение Options.Enabled
+       * @param apexOptions
+       * @param enabled
+       * @private
+       */
+    }, {
+      key: "_setOptionsEnabled",
+      value: function _setOptionsEnabled(apexOptions, enabled) {
+        if (enabled.hasOwnProperty('animations') && typeof enabled.animations === 'boolean') {
+          apexOptions.chart.animations.enabled = enabled.animations;
+        }
+        if (enabled.hasOwnProperty('zoom') && typeof enabled.zoom === 'boolean') {
+          apexOptions.chart.zoom.enabled = enabled.zoom;
+        }
+        if (enabled.hasOwnProperty('toolbar') && typeof enabled.toolbar === 'boolean') {
+          apexOptions.chart.toolbar.show = enabled.toolbar;
+        }
+        if (enabled.hasOwnProperty('minimize') && typeof enabled.minimize === 'boolean') {
+          apexOptions.chart.sparkline.enabled = enabled.minimize;
+        }
+        if (enabled.hasOwnProperty('legend') && typeof enabled.legend === 'boolean') {
+          apexOptions.legend.show = enabled.legend;
+        }
+        if (enabled.hasOwnProperty('labels') && typeof enabled.labels === 'boolean') {
+          apexOptions.dataLabels.enabled = enabled.labels;
+        }
+        if (enabled.hasOwnProperty('tooltip') && typeof enabled.tooltip === 'boolean') {
+          apexOptions.tooltip.enabled = enabled.tooltip;
+        }
+      }
+
+      /**
+       * Заполнение Options.Tooltip
+       * @param apexOptions
+       * @param tooltip
+       * @private
+       */
+    }, {
+      key: "_setOptionsTooltip",
+      value: function _setOptionsTooltip(apexOptions, tooltip) {
+        if (tooltip.hasOwnProperty('mode') && typeof tooltip.mode === 'string') {
+          if (tooltip.mode === 'all') {
+            apexOptions.tooltip.shared = true;
+            apexOptions.tooltip.intersect = false;
+          } else if (tooltip.mode === 'single') {
+            apexOptions.tooltip.shared = false;
+            apexOptions.tooltip.intersect = true;
+          }
+        }
+        if (tooltip.hasOwnProperty('formatter')) {
+          if (typeof tooltip.formatter === 'function') {
+            apexOptions.tooltip.y.formatter = tooltip.formatter;
+          } else if (typeof tooltip.formatter === 'string') {
+            var func = ChartUtils.getFunctionByName(tooltip.formatter);
+            if (typeof func === 'function') {
+              apexOptions.tooltip.y.formatter = func;
+            }
+          }
+        } else if (tooltip.hasOwnProperty('valueSuffix') && typeof tooltip.valueSuffix === 'string' || tooltip.hasOwnProperty('valuePrefix') && typeof tooltip.valuePrefix === 'string') {
+          var valueSuffix = '';
+          var valuePrefix = '';
+          if (tooltip.hasOwnProperty('valueSuffix') && typeof tooltip.valueSuffix === 'string') {
+            valueSuffix = tooltip.valueSuffix;
+          }
+          if (tooltip.hasOwnProperty('valuePrefix') && typeof tooltip.valuePrefix === 'string') {
+            valuePrefix = tooltip.valuePrefix;
+          }
+          apexOptions.tooltip.y.formatter = function (val, data) {
+            return valuePrefix + val + valueSuffix;
+          };
+        }
+      }
+
+      /**
+       * Заполнение Options.Styles.Bar
+       * @param apexOptions
+       * @param axis
+       * @private
+       */
+    }, {
+      key: "_setOptionsAxis",
+      value: function _setOptionsAxis(apexOptions, axis) {
+        // Xaxis
+        if (axis.hasOwnProperty('xaxis') && ChartUtils.isObject(axis.xaxis)) {
+          if (axis.xaxis.hasOwnProperty('show') && typeof axis.xaxis.show === 'boolean') {
+            apexOptions.xaxis.show = axis.xaxis.show;
+          }
+          if (axis.xaxis.hasOwnProperty('title') && typeof axis.xaxis.title === 'string') {
+            apexOptions.xaxis.title.text = axis.xaxis.title;
+          }
+          if (axis.xaxis.hasOwnProperty('type') && typeof axis.xaxis.type === 'string') {
+            apexOptions.xaxis.type = axis.xaxis.type;
+          }
+          if (axis.xaxis.hasOwnProperty('position') && typeof axis.xaxis.position === 'string') {
+            apexOptions.xaxis.position = axis.xaxis.position;
+          }
+          if (axis.xaxis.hasOwnProperty('border') && typeof axis.xaxis.border === 'boolean') {
+            apexOptions.xaxis.axisBorder.show = axis.xaxis.border;
+            apexOptions.xaxis.axisTicks.show = axis.xaxis.border;
+          }
+          if (axis.xaxis.hasOwnProperty('color') && typeof axis.xaxis.color === 'string') {
+            apexOptions.xaxis.axisBorder.color = axis.xaxis.color;
+            apexOptions.xaxis.axisTicks.color = axis.xaxis.color;
+            apexOptions.xaxis.title.style.color = axis.xaxis.color;
+            apexOptions.xaxis.labels.style.colors = axis.xaxis.color;
+          }
+        }
+
+        // Yaxis
+        if (axis.hasOwnProperty('yaxis') && ChartUtils.isObject(axis.yaxis)) {
+          if (axis.yaxis.hasOwnProperty('show') && typeof axis.xaxis.show === 'boolean') {
+            apexOptions.yaxis.show = axis.yaxis.show;
+          }
+          if (axis.yaxis.hasOwnProperty('logarithmic') && typeof axis.yaxis.logarithmic === 'boolean') {
+            apexOptions.yaxis.logarithmic = axis.yaxis.logarithmic;
+          }
+          if (axis.yaxis.hasOwnProperty('title') && typeof axis.yaxis.title === 'string') {
+            apexOptions.yaxis.title.text = axis.yaxis.title;
+          }
+          if (axis.yaxis.hasOwnProperty('position') && typeof axis.yaxis.position === 'string') {
+            apexOptions.yaxis.opposite = axis.yaxis.position === 'right';
+          }
+          if (axis.yaxis.hasOwnProperty('logBase') && typeof axis.yaxis.logBase === 'number') {
+            apexOptions.yaxis.logBase = axis.yaxis.logBase;
+          }
+          if (axis.yaxis.hasOwnProperty('min') && typeof axis.yaxis.min === 'number') {
+            apexOptions.yaxis.min = axis.yaxis.min;
+          }
+          if (axis.yaxis.hasOwnProperty('max') && typeof axis.yaxis.max === 'number') {
+            apexOptions.yaxis.max = axis.yaxis.max;
+          }
+          if (axis.yaxis.hasOwnProperty('border') && typeof axis.yaxis.border === 'boolean') {
+            apexOptions.yaxis.axisBorder.show = axis.yaxis.border;
+            apexOptions.yaxis.axisTicks.show = axis.yaxis.border;
+          }
+          if (axis.yaxis.hasOwnProperty('color') && typeof axis.yaxis.color === 'string') {
+            apexOptions.yaxis.axisBorder.color = axis.yaxis.color;
+            apexOptions.yaxis.axisTicks.color = axis.yaxis.color;
+            apexOptions.yaxis.title.style.color = axis.yaxis.color;
+            apexOptions.yaxis.labels.style.colors = axis.yaxis.color;
+          }
+        }
+
+        // Grid
+        if (axis.hasOwnProperty('grid') && ChartUtils.isObject(axis.grid)) {
+          if (axis.grid.hasOwnProperty('show') && typeof axis.grid.show === 'boolean') {
+            apexOptions.grid.show = axis.grid.show;
+          }
+          if (axis.grid.hasOwnProperty('xLines') && typeof axis.grid.xLines === 'boolean') {
+            apexOptions.grid.xaxis.lines.show = axis.grid.xLines;
+          }
+          if (axis.grid.hasOwnProperty('yLines') && typeof axis.grid.yLines === 'boolean') {
+            apexOptions.grid.yaxis.lines.show = axis.grid.yLines;
+          }
+          if (axis.grid.hasOwnProperty('dash') && typeof axis.grid.dash === 'number') {
+            apexOptions.grid.strokeDashArray = axis.grid.dash;
+          }
+          if (axis.grid.hasOwnProperty('color') && typeof axis.grid.color === 'string') {
+            apexOptions.grid.borderColor = axis.grid.color;
+          }
+        }
+      }
+
+      /**
+       * Заполнение Options.Theme
+       * @param apexOptions
+       * @param theme
+       * @private
+       */
+    }, {
+      key: "_setOptionsTheme",
+      value: function _setOptionsTheme(apexOptions, theme) {
+        // Theme
+        if (theme.hasOwnProperty('mode') && typeof theme.mode === 'string') {
+          apexOptions.theme.mode = theme.mode;
+        }
+        if (theme.hasOwnProperty('colorScheme') && typeof theme.colorScheme === 'string') {
+          if (theme.colorScheme === 'monochrome') {
+            apexOptions.theme.monochrome.enabled = true;
+            apexOptions.theme.palette = null;
+          } else {
+            apexOptions.theme.palette = theme.colorScheme;
+          }
+        }
+        if (theme.hasOwnProperty('monochromeColor') && typeof theme.monochromeColor === 'string') {
+          apexOptions.theme.monochrome.color = theme.monochromeColor;
+        }
+        if (theme.hasOwnProperty('background') && typeof theme.background === 'string') {
+          apexOptions.chart.background = theme.background;
+        }
+      }
+    }]);
+  }();
+
+  var Chart$1 = {
     lang: {},
     type: {},
     _instances: {},
@@ -2648,16 +2633,15 @@
     /**
      * Создание экземпляра формы
      * @param {object} options
-     * @returns {CoreUI.chart.instance}
+     * @returns {ChartInstance}
      */
     create: function create(options) {
-      var instance = $.extend(true, {}, coreuiChartInstance);
       if (!options.hasOwnProperty('lang')) {
-        options.lang = coreuiChart.getSetting('lang');
+        options.lang = Chart$1.getSetting('lang');
       }
       var langList = this.lang.hasOwnProperty(options.lang) ? this.lang[options.lang] : {};
-      options.langList = options.hasOwnProperty('langList') && coreuiChartUtils.isObject(options.langList) ? $.extend(true, {}, langList, options.langList) : langList;
-      instance._init(this, options instanceof Object ? options : {});
+      options.langList = options.hasOwnProperty('langList') && ChartUtils.isObject(options.langList) ? $.extend(true, {}, langList, options.langList) : langList;
+      var instance = new ChartInstance(this, options instanceof Object ? options : {});
       var chartId = instance.getId();
       this._instances[chartId] = instance;
       return instance;
@@ -2665,7 +2649,7 @@
     /**
      * Получение экземпляра формы по id
      * @param {string} id
-     * @returns {CoreUI.chart.instance|null}
+     * @returns {ChartInstance|null}
      */
     get: function get(id) {
       if (!this._instances.hasOwnProperty(id)) {
@@ -2707,7 +2691,7 @@
   * https://github.com/svgdotjs/svg.draggable.js
   * Copyright (c) 2019 Wout Fierens; Licensed MIT */function(){function t(t){t.remember("_draggable",this),this.el=t;}t.prototype.init=function(t,e){var i=this;this.constraint=t,this.value=e,this.el.on("mousedown.drag",function(t){i.start(t);}),this.el.on("touchstart.drag",function(t){i.start(t);});},t.prototype.transformPoint=function(t,e){var i=(t=t||window.event).changedTouches&&t.changedTouches[0]||t;return this.p.x=i.clientX-(e||0),this.p.y=i.clientY,this.p.matrixTransform(this.m);},t.prototype.getBBox=function(){var t=this.el.bbox();return this.el instanceof SVG.Nested&&(t=this.el.rbox()),(this.el instanceof SVG.G||this.el instanceof SVG.Use||this.el instanceof SVG.Nested)&&(t.x=this.el.x(),t.y=this.el.y()),t;},t.prototype.start=function(t){if("click"!=t.type&&"mousedown"!=t.type&&"mousemove"!=t.type||1==(t.which||t.buttons)){var e=this;if(this.el.fire("beforedrag",{event:t,handler:this}),!this.el.event().defaultPrevented){t.preventDefault(),t.stopPropagation(),this.parent=this.parent||this.el.parent(SVG.Nested)||this.el.parent(SVG.Doc),this.p=this.parent.node.createSVGPoint(),this.m=this.el.node.getScreenCTM().inverse();var i,a=this.getBBox();if(this.el instanceof SVG.Text)switch(i=this.el.node.getComputedTextLength(),this.el.attr("text-anchor")){case"middle":i/=2;break;case"start":i=0;}this.startPoints={point:this.transformPoint(t,i),box:a,transform:this.el.transform()},SVG.on(window,"mousemove.drag",function(t){e.drag(t);}),SVG.on(window,"touchmove.drag",function(t){e.drag(t);}),SVG.on(window,"mouseup.drag",function(t){e.end(t);}),SVG.on(window,"touchend.drag",function(t){e.end(t);}),this.el.fire("dragstart",{event:t,p:this.startPoints.point,m:this.m,handler:this});}}},t.prototype.drag=function(t){var e=this.getBBox(),i=this.transformPoint(t),a=this.startPoints.box.x+i.x-this.startPoints.point.x,s=this.startPoints.box.y+i.y-this.startPoints.point.y,r=this.constraint,o=i.x-this.startPoints.point.x,n=i.y-this.startPoints.point.y;if(this.el.fire("dragmove",{event:t,p:i,m:this.m,handler:this}),this.el.event().defaultPrevented)return i;if("function"==typeof r){var l=r.call(this.el,a,s,this.m);"boolean"==typeof l&&(l={x:l,y:l}),!0===l.x?this.el.x(a):!1!==l.x&&this.el.x(l.x),!0===l.y?this.el.y(s):!1!==l.y&&this.el.y(l.y);}else "object"==typeof r&&(null!=r.minX&&a<r.minX?o=(a=r.minX)-this.startPoints.box.x:null!=r.maxX&&a>r.maxX-e.width&&(o=(a=r.maxX-e.width)-this.startPoints.box.x),null!=r.minY&&s<r.minY?n=(s=r.minY)-this.startPoints.box.y:null!=r.maxY&&s>r.maxY-e.height&&(n=(s=r.maxY-e.height)-this.startPoints.box.y),null!=r.snapToGrid&&(a-=a%r.snapToGrid,s-=s%r.snapToGrid,o-=o%r.snapToGrid,n-=n%r.snapToGrid),this.el instanceof SVG.G?this.el.matrix(this.startPoints.transform).transform({x:o,y:n},!0):this.el.move(a,s));return i;},t.prototype.end=function(t){var e=this.drag(t);this.el.fire("dragend",{event:t,p:e,m:this.m,handler:this}),SVG.off(window,"mousemove.drag"),SVG.off(window,"touchmove.drag"),SVG.off(window,"mouseup.drag"),SVG.off(window,"touchend.drag");},SVG.extend(SVG.Element,{draggable:function(e,i){"function"!=typeof e&&"object"!=typeof e||(i=e,e=!0);var a=this.remember("_draggable")||new t(this);return (e=void 0===e||e)?a.init(i||{},e):(this.off("mousedown.drag"),this.off("touchstart.drag")),this;}});}.call(void 0),function(){function t(t){this.el=t,t.remember("_selectHandler",this),this.pointSelection={isSelected:!1},this.rectSelection={isSelected:!1},this.pointsList={lt:[0,0],rt:["width",0],rb:["width","height"],lb:[0,"height"],t:["width",0],r:["width","height"],b:["width","height"],l:[0,"height"]},this.pointCoord=function(t,e,i){var a="string"!=typeof t?t:e[t];return i?a/2:a;},this.pointCoords=function(t,e){var i=this.pointsList[t];return {x:this.pointCoord(i[0],e,"t"===t||"b"===t),y:this.pointCoord(i[1],e,"r"===t||"l"===t)};};}t.prototype.init=function(t,e){var i=this.el.bbox();this.options={};var a=this.el.selectize.defaults.points;for(var s in this.el.selectize.defaults)this.options[s]=this.el.selectize.defaults[s],void 0!==e[s]&&(this.options[s]=e[s]);var r=["points","pointsExclude"];for(var s in r){var o=this.options[r[s]];"string"==typeof o?o=o.length>0?o.split(/\s*,\s*/i):[]:"boolean"==typeof o&&"points"===r[s]&&(o=o?a:[]),this.options[r[s]]=o;}this.options.points=[a,this.options.points].reduce(function(t,e){return t.filter(function(t){return e.indexOf(t)>-1;});}),this.options.points=[this.options.points,this.options.pointsExclude].reduce(function(t,e){return t.filter(function(t){return e.indexOf(t)<0;});}),this.parent=this.el.parent(),this.nested=this.nested||this.parent.group(),this.nested.matrix(new SVG.Matrix(this.el).translate(i.x,i.y)),this.options.deepSelect&&-1!==["line","polyline","polygon"].indexOf(this.el.type)?this.selectPoints(t):this.selectRect(t),this.observe(),this.cleanup();},t.prototype.selectPoints=function(t){return this.pointSelection.isSelected=t,this.pointSelection.set||(this.pointSelection.set=this.parent.set(),this.drawPoints()),this;},t.prototype.getPointArray=function(){var t=this.el.bbox();return this.el.array().valueOf().map(function(e){return [e[0]-t.x,e[1]-t.y];});},t.prototype.drawPoints=function(){for(var t=this,e=this.getPointArray(),i=0,a=e.length;i<a;++i){var s=function(e){return function(i){(i=i||window.event).preventDefault?i.preventDefault():i.returnValue=!1,i.stopPropagation();var a=i.pageX||i.touches[0].pageX,s=i.pageY||i.touches[0].pageY;t.el.fire("point",{x:a,y:s,i:e,event:i});};}(i),r=this.drawPoint(e[i][0],e[i][1]).addClass(this.options.classPoints).addClass(this.options.classPoints+"_point").on("touchstart",s).on("mousedown",s);this.pointSelection.set.add(r);}},t.prototype.drawPoint=function(t,e){var i=this.options.pointType;switch(i){case"circle":return this.drawCircle(t,e);case"rect":return this.drawRect(t,e);default:if("function"==typeof i)return i.call(this,t,e);throw new Error("Unknown "+i+" point type!");}},t.prototype.drawCircle=function(t,e){return this.nested.circle(this.options.pointSize).center(t,e);},t.prototype.drawRect=function(t,e){return this.nested.rect(this.options.pointSize,this.options.pointSize).center(t,e);},t.prototype.updatePointSelection=function(){var t=this.getPointArray();this.pointSelection.set.each(function(e){this.cx()===t[e][0]&&this.cy()===t[e][1]||this.center(t[e][0],t[e][1]);});},t.prototype.updateRectSelection=function(){var t=this,e=this.el.bbox();if(this.rectSelection.set.get(0).attr({width:e.width,height:e.height}),this.options.points.length&&this.options.points.map(function(i,a){var s=t.pointCoords(i,e);t.rectSelection.set.get(a+1).center(s.x,s.y);}),this.options.rotationPoint){var i=this.rectSelection.set.length();this.rectSelection.set.get(i-1).center(e.width/2,20);}},t.prototype.selectRect=function(t){var e=this,i=this.el.bbox();function a(t){return function(i){(i=i||window.event).preventDefault?i.preventDefault():i.returnValue=!1,i.stopPropagation();var a=i.pageX||i.touches[0].pageX,s=i.pageY||i.touches[0].pageY;e.el.fire(t,{x:a,y:s,event:i});};}if(this.rectSelection.isSelected=t,this.rectSelection.set=this.rectSelection.set||this.parent.set(),this.rectSelection.set.get(0)||this.rectSelection.set.add(this.nested.rect(i.width,i.height).addClass(this.options.classRect)),this.options.points.length&&this.rectSelection.set.length()<2){this.options.points.map(function(t,s){var r=e.pointCoords(t,i),o=e.drawPoint(r.x,r.y).attr("class",e.options.classPoints+"_"+t).on("mousedown",a(t)).on("touchstart",a(t));e.rectSelection.set.add(o);}),this.rectSelection.set.each(function(){this.addClass(e.options.classPoints);});}if(this.options.rotationPoint&&(this.options.points&&!this.rectSelection.set.get(9)||!this.options.points&&!this.rectSelection.set.get(1))){var s=function(t){(t=t||window.event).preventDefault?t.preventDefault():t.returnValue=!1,t.stopPropagation();var i=t.pageX||t.touches[0].pageX,a=t.pageY||t.touches[0].pageY;e.el.fire("rot",{x:i,y:a,event:t});},r=this.drawPoint(i.width/2,20).attr("class",this.options.classPoints+"_rot").on("touchstart",s).on("mousedown",s);this.rectSelection.set.add(r);}},t.prototype.handler=function(){var t=this.el.bbox();this.nested.matrix(new SVG.Matrix(this.el).translate(t.x,t.y)),this.rectSelection.isSelected&&this.updateRectSelection(),this.pointSelection.isSelected&&this.updatePointSelection();},t.prototype.observe=function(){var t=this;if(MutationObserver){if(this.rectSelection.isSelected||this.pointSelection.isSelected)this.observerInst=this.observerInst||new MutationObserver(function(){t.handler();}),this.observerInst.observe(this.el.node,{attributes:!0});else try{this.observerInst.disconnect(),delete this.observerInst;}catch(t){}}else this.el.off("DOMAttrModified.select"),(this.rectSelection.isSelected||this.pointSelection.isSelected)&&this.el.on("DOMAttrModified.select",function(){t.handler();});},t.prototype.cleanup=function(){!this.rectSelection.isSelected&&this.rectSelection.set&&(this.rectSelection.set.each(function(){this.remove();}),this.rectSelection.set.clear(),delete this.rectSelection.set),!this.pointSelection.isSelected&&this.pointSelection.set&&(this.pointSelection.set.each(function(){this.remove();}),this.pointSelection.set.clear(),delete this.pointSelection.set),this.pointSelection.isSelected||this.rectSelection.isSelected||(this.nested.remove(),delete this.nested);},SVG.extend(SVG.Element,{selectize:function(e,i){return "object"==typeof e&&(i=e,e=!0),(this.remember("_selectHandler")||new t(this)).init(void 0===e||e,i||{}),this;}}),SVG.Element.prototype.selectize.defaults={points:["lt","rt","rb","lb","t","r","b","l"],pointsExclude:[],classRect:"svg_select_boundingRect",classPoints:"svg_select_points",pointSize:7,rotationPoint:!0,deepSelect:!1,pointType:"circle"};}(),function(){(function(){function t(t){t.remember("_resizeHandler",this),this.el=t,this.parameters={},this.lastUpdateCall=null,this.p=t.doc().node.createSVGPoint();}t.prototype.transformPoint=function(t,e,i){return this.p.x=t-(this.offset.x-window.pageXOffset),this.p.y=e-(this.offset.y-window.pageYOffset),this.p.matrixTransform(i||this.m);},t.prototype._extractPosition=function(t){return {x:null!=t.clientX?t.clientX:t.touches[0].clientX,y:null!=t.clientY?t.clientY:t.touches[0].clientY};},t.prototype.init=function(t){var e=this;if(this.stop(),"stop"!==t){for(var i in this.options={},this.el.resize.defaults)this.options[i]=this.el.resize.defaults[i],void 0!==t[i]&&(this.options[i]=t[i]);this.el.on("lt.resize",function(t){e.resize(t||window.event);}),this.el.on("rt.resize",function(t){e.resize(t||window.event);}),this.el.on("rb.resize",function(t){e.resize(t||window.event);}),this.el.on("lb.resize",function(t){e.resize(t||window.event);}),this.el.on("t.resize",function(t){e.resize(t||window.event);}),this.el.on("r.resize",function(t){e.resize(t||window.event);}),this.el.on("b.resize",function(t){e.resize(t||window.event);}),this.el.on("l.resize",function(t){e.resize(t||window.event);}),this.el.on("rot.resize",function(t){e.resize(t||window.event);}),this.el.on("point.resize",function(t){e.resize(t||window.event);}),this.update();}},t.prototype.stop=function(){return this.el.off("lt.resize"),this.el.off("rt.resize"),this.el.off("rb.resize"),this.el.off("lb.resize"),this.el.off("t.resize"),this.el.off("r.resize"),this.el.off("b.resize"),this.el.off("l.resize"),this.el.off("rot.resize"),this.el.off("point.resize"),this;},t.prototype.resize=function(t){var e=this;this.m=this.el.node.getScreenCTM().inverse(),this.offset={x:window.pageXOffset,y:window.pageYOffset};var i=this._extractPosition(t.detail.event);if(this.parameters={type:this.el.type,p:this.transformPoint(i.x,i.y),x:t.detail.x,y:t.detail.y,box:this.el.bbox(),rotation:this.el.transform().rotation},"text"===this.el.type&&(this.parameters.fontSize=this.el.attr()["font-size"]),void 0!==t.detail.i){var a=this.el.array().valueOf();this.parameters.i=t.detail.i,this.parameters.pointCoords=[a[t.detail.i][0],a[t.detail.i][1]];}switch(t.type){case"lt":this.calc=function(t,e){var i=this.snapToGrid(t,e);if(this.parameters.box.width-i[0]>0&&this.parameters.box.height-i[1]>0){if("text"===this.parameters.type)return this.el.move(this.parameters.box.x+i[0],this.parameters.box.y),void this.el.attr("font-size",this.parameters.fontSize-i[0]);i=this.checkAspectRatio(i),this.el.move(this.parameters.box.x+i[0],this.parameters.box.y+i[1]).size(this.parameters.box.width-i[0],this.parameters.box.height-i[1]);}};break;case"rt":this.calc=function(t,e){var i=this.snapToGrid(t,e,2);if(this.parameters.box.width+i[0]>0&&this.parameters.box.height-i[1]>0){if("text"===this.parameters.type)return this.el.move(this.parameters.box.x-i[0],this.parameters.box.y),void this.el.attr("font-size",this.parameters.fontSize+i[0]);i=this.checkAspectRatio(i,!0),this.el.move(this.parameters.box.x,this.parameters.box.y+i[1]).size(this.parameters.box.width+i[0],this.parameters.box.height-i[1]);}};break;case"rb":this.calc=function(t,e){var i=this.snapToGrid(t,e,0);if(this.parameters.box.width+i[0]>0&&this.parameters.box.height+i[1]>0){if("text"===this.parameters.type)return this.el.move(this.parameters.box.x-i[0],this.parameters.box.y),void this.el.attr("font-size",this.parameters.fontSize+i[0]);i=this.checkAspectRatio(i),this.el.move(this.parameters.box.x,this.parameters.box.y).size(this.parameters.box.width+i[0],this.parameters.box.height+i[1]);}};break;case"lb":this.calc=function(t,e){var i=this.snapToGrid(t,e,1);if(this.parameters.box.width-i[0]>0&&this.parameters.box.height+i[1]>0){if("text"===this.parameters.type)return this.el.move(this.parameters.box.x+i[0],this.parameters.box.y),void this.el.attr("font-size",this.parameters.fontSize-i[0]);i=this.checkAspectRatio(i,!0),this.el.move(this.parameters.box.x+i[0],this.parameters.box.y).size(this.parameters.box.width-i[0],this.parameters.box.height+i[1]);}};break;case"t":this.calc=function(t,e){var i=this.snapToGrid(t,e,2);if(this.parameters.box.height-i[1]>0){if("text"===this.parameters.type)return;this.el.move(this.parameters.box.x,this.parameters.box.y+i[1]).height(this.parameters.box.height-i[1]);}};break;case"r":this.calc=function(t,e){var i=this.snapToGrid(t,e,0);if(this.parameters.box.width+i[0]>0){if("text"===this.parameters.type)return;this.el.move(this.parameters.box.x,this.parameters.box.y).width(this.parameters.box.width+i[0]);}};break;case"b":this.calc=function(t,e){var i=this.snapToGrid(t,e,0);if(this.parameters.box.height+i[1]>0){if("text"===this.parameters.type)return;this.el.move(this.parameters.box.x,this.parameters.box.y).height(this.parameters.box.height+i[1]);}};break;case"l":this.calc=function(t,e){var i=this.snapToGrid(t,e,1);if(this.parameters.box.width-i[0]>0){if("text"===this.parameters.type)return;this.el.move(this.parameters.box.x+i[0],this.parameters.box.y).width(this.parameters.box.width-i[0]);}};break;case"rot":this.calc=function(t,e){var i=t+this.parameters.p.x,a=e+this.parameters.p.y,s=Math.atan2(this.parameters.p.y-this.parameters.box.y-this.parameters.box.height/2,this.parameters.p.x-this.parameters.box.x-this.parameters.box.width/2),r=Math.atan2(a-this.parameters.box.y-this.parameters.box.height/2,i-this.parameters.box.x-this.parameters.box.width/2),o=this.parameters.rotation+180*(r-s)/Math.PI+this.options.snapToAngle/2;this.el.center(this.parameters.box.cx,this.parameters.box.cy).rotate(o-o%this.options.snapToAngle,this.parameters.box.cx,this.parameters.box.cy);};break;case"point":this.calc=function(t,e){var i=this.snapToGrid(t,e,this.parameters.pointCoords[0],this.parameters.pointCoords[1]),a=this.el.array().valueOf();a[this.parameters.i][0]=this.parameters.pointCoords[0]+i[0],a[this.parameters.i][1]=this.parameters.pointCoords[1]+i[1],this.el.plot(a);};}this.el.fire("resizestart",{dx:this.parameters.x,dy:this.parameters.y,event:t}),SVG.on(window,"touchmove.resize",function(t){e.update(t||window.event);}),SVG.on(window,"touchend.resize",function(){e.done();}),SVG.on(window,"mousemove.resize",function(t){e.update(t||window.event);}),SVG.on(window,"mouseup.resize",function(){e.done();});},t.prototype.update=function(t){if(t){var e=this._extractPosition(t),i=this.transformPoint(e.x,e.y),a=i.x-this.parameters.p.x,s=i.y-this.parameters.p.y;this.lastUpdateCall=[a,s],this.calc(a,s),this.el.fire("resizing",{dx:a,dy:s,event:t});}else this.lastUpdateCall&&this.calc(this.lastUpdateCall[0],this.lastUpdateCall[1]);},t.prototype.done=function(){this.lastUpdateCall=null,SVG.off(window,"mousemove.resize"),SVG.off(window,"mouseup.resize"),SVG.off(window,"touchmove.resize"),SVG.off(window,"touchend.resize"),this.el.fire("resizedone");},t.prototype.snapToGrid=function(t,e,i,a){var s;return void 0!==a?s=[(i+t)%this.options.snapToGrid,(a+e)%this.options.snapToGrid]:(i=null==i?3:i,s=[(this.parameters.box.x+t+(1&i?0:this.parameters.box.width))%this.options.snapToGrid,(this.parameters.box.y+e+(2&i?0:this.parameters.box.height))%this.options.snapToGrid]),t<0&&(s[0]-=this.options.snapToGrid),e<0&&(s[1]-=this.options.snapToGrid),t-=Math.abs(s[0])<this.options.snapToGrid/2?s[0]:s[0]-(t<0?-this.options.snapToGrid:this.options.snapToGrid),e-=Math.abs(s[1])<this.options.snapToGrid/2?s[1]:s[1]-(e<0?-this.options.snapToGrid:this.options.snapToGrid),this.constraintToBox(t,e,i,a);},t.prototype.constraintToBox=function(t,e,i,a){var s,r,o=this.options.constraint||{};return void 0!==a?(s=i,r=a):(s=this.parameters.box.x+(1&i?0:this.parameters.box.width),r=this.parameters.box.y+(2&i?0:this.parameters.box.height)),void 0!==o.minX&&s+t<o.minX&&(t=o.minX-s),void 0!==o.maxX&&s+t>o.maxX&&(t=o.maxX-s),void 0!==o.minY&&r+e<o.minY&&(e=o.minY-r),void 0!==o.maxY&&r+e>o.maxY&&(e=o.maxY-r),[t,e];},t.prototype.checkAspectRatio=function(t,e){if(!this.options.saveAspectRatio)return t;var i=t.slice(),a=this.parameters.box.width/this.parameters.box.height,s=this.parameters.box.width+t[0],r=this.parameters.box.height-t[1],o=s/r;return o<a?(i[1]=s/a-this.parameters.box.height,e&&(i[1]=-i[1])):o>a&&(i[0]=this.parameters.box.width-r*a,e&&(i[0]=-i[0])),i;},SVG.extend(SVG.Element,{resize:function(e){return (this.remember("_resizeHandler")||new t(this)).init(e||{}),this;}}),SVG.Element.prototype.resize.defaults={snapToAngle:.1,snapToGrid:1,constraint:{},saveAspectRatio:!1};}).call(this);}(),void 0===window.Apex&&(window.Apex={});var Gt=function(){function t(e){a(this,t),this.ctx=e,this.w=e.w;}return r(t,[{key:"initModules",value:function(){this.ctx.publicMethods=["updateOptions","updateSeries","appendData","appendSeries","toggleSeries","showSeries","hideSeries","setLocale","resetSeries","zoomX","toggleDataPointSelection","dataURI","exportToCSV","addXaxisAnnotation","addYaxisAnnotation","addPointAnnotation","clearAnnotations","removeAnnotation","paper","destroy"],this.ctx.eventList=["click","mousedown","mousemove","mouseleave","touchstart","touchmove","touchleave","mouseup","touchend"],this.ctx.animations=new b(this.ctx),this.ctx.axes=new J(this.ctx),this.ctx.core=new Wt(this.ctx.el,this.ctx),this.ctx.config=new E({}),this.ctx.data=new W(this.ctx),this.ctx.grid=new j(this.ctx),this.ctx.graphics=new m(this.ctx),this.ctx.coreUtils=new y(this.ctx),this.ctx.crosshairs=new Q(this.ctx),this.ctx.events=new Z(this.ctx),this.ctx.exports=new G(this.ctx),this.ctx.localization=new $$1(this.ctx),this.ctx.options=new L(),this.ctx.responsive=new K(this.ctx),this.ctx.series=new N(this.ctx),this.ctx.theme=new tt(this.ctx),this.ctx.formatters=new T(this.ctx),this.ctx.titleSubtitle=new et(this.ctx),this.ctx.legend=new lt(this.ctx),this.ctx.toolbar=new ht(this.ctx),this.ctx.tooltip=new bt(this.ctx),this.ctx.dimensions=new ot(this.ctx),this.ctx.updateHelpers=new Bt(this.ctx),this.ctx.zoomPanSelection=new ct(this.ctx),this.ctx.w.globals.tooltip=new bt(this.ctx);}}]),t;}(),Vt=function(){function t(e){a(this,t),this.ctx=e,this.w=e.w;}return r(t,[{key:"clear",value:function(t){var e=t.isUpdating;this.ctx.zoomPanSelection&&this.ctx.zoomPanSelection.destroy(),this.ctx.toolbar&&this.ctx.toolbar.destroy(),this.ctx.animations=null,this.ctx.axes=null,this.ctx.annotations=null,this.ctx.core=null,this.ctx.data=null,this.ctx.grid=null,this.ctx.series=null,this.ctx.responsive=null,this.ctx.theme=null,this.ctx.formatters=null,this.ctx.titleSubtitle=null,this.ctx.legend=null,this.ctx.dimensions=null,this.ctx.options=null,this.ctx.crosshairs=null,this.ctx.zoomPanSelection=null,this.ctx.updateHelpers=null,this.ctx.toolbar=null,this.ctx.localization=null,this.ctx.w.globals.tooltip=null,this.clearDomElements({isUpdating:e});}},{key:"killSVG",value:function(t){t.each(function(t,e){this.removeClass("*"),this.off(),this.stop();},!0),t.ungroup(),t.clear();}},{key:"clearDomElements",value:function(t){var e=this,i=t.isUpdating,a=this.w.globals.dom.Paper.node;a.parentNode&&a.parentNode.parentNode&&!i&&(a.parentNode.parentNode.style.minHeight="unset");var s=this.w.globals.dom.baseEl;s&&this.ctx.eventList.forEach(function(t){s.removeEventListener(t,e.ctx.events.documentEvent);});var r=this.w.globals.dom;if(null!==this.ctx.el)for(;this.ctx.el.firstChild;)this.ctx.el.removeChild(this.ctx.el.firstChild);this.killSVG(r.Paper),r.Paper.remove(),r.elWrap=null,r.elGraphical=null,r.elLegendWrap=null,r.elLegendForeign=null,r.baseEl=null,r.elGridRect=null,r.elGridRectMask=null,r.elGridRectMarkerMask=null,r.elForecastMask=null,r.elNonForecastMask=null,r.elDefs=null;}}]),t;}(),jt=new WeakMap();var _t=function(){function t(e,i){a(this,t),this.opts=i,this.ctx=this,this.w=new F(i).init(),this.el=e,this.w.globals.cuid=x.randomId(),this.w.globals.chartID=this.w.config.chart.id?x.escapeString(this.w.config.chart.id):this.w.globals.cuid,new Gt(this).initModules(),this.create=x.bind(this.create,this),this.windowResizeHandler=this._windowResizeHandler.bind(this),this.parentResizeHandler=this._parentResizeCallback.bind(this);}return r(t,[{key:"render",value:function(){var t=this;return new Promise(function(e,i){if(null!==t.el){void 0===Apex._chartInstances&&(Apex._chartInstances=[]),t.w.config.chart.id&&Apex._chartInstances.push({id:t.w.globals.chartID,group:t.w.config.chart.group,chart:t}),t.setLocale(t.w.config.chart.defaultLocale);var a=t.w.config.chart.events.beforeMount;if("function"==typeof a&&a(t,t.w),t.events.fireEvent("beforeMount",[t,t.w]),window.addEventListener("resize",t.windowResizeHandler),function(t,e){var i=!1;if(t.nodeType!==Node.DOCUMENT_FRAGMENT_NODE){var a=t.getBoundingClientRect();"none"!==t.style.display&&0!==a.width||(i=!0);}var s=new ResizeObserver(function(a){i&&e.call(t,a),i=!0;});t.nodeType===Node.DOCUMENT_FRAGMENT_NODE?Array.from(t.children).forEach(function(t){return s.observe(t);}):s.observe(t),jt.set(e,s);}(t.el.parentNode,t.parentResizeHandler),!t.css){var s=t.el.getRootNode&&t.el.getRootNode(),r=x.is("ShadowRoot",s),o=t.el.ownerDocument,n=o.getElementById("apexcharts-css");!r&&n||(t.css=document.createElement("style"),t.css.id="apexcharts-css",t.css.textContent='@keyframes opaque {\n  0% {\n      opacity: 0\n  }\n\n  to {\n      opacity: 1\n  }\n}\n\n@keyframes resizeanim {\n  0%,to {\n      opacity: 0\n  }\n}\n\n.apexcharts-canvas {\n  position: relative;\n  user-select: none\n}\n\n.apexcharts-canvas ::-webkit-scrollbar {\n  -webkit-appearance: none;\n  width: 6px\n}\n\n.apexcharts-canvas ::-webkit-scrollbar-thumb {\n  border-radius: 4px;\n  background-color: rgba(0,0,0,.5);\n  box-shadow: 0 0 1px rgba(255,255,255,.5);\n  -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5)\n}\n\n.apexcharts-inner {\n  position: relative\n}\n\n.apexcharts-text tspan {\n  font-family: inherit\n}\n\n.legend-mouseover-inactive {\n  transition: .15s ease all;\n  opacity: .2\n}\n\n.apexcharts-legend-text {\n  padding-left: 15px;\n  margin-left: -15px;\n}\n\n.apexcharts-series-collapsed {\n  opacity: 0\n}\n\n.apexcharts-tooltip {\n  border-radius: 5px;\n  box-shadow: 2px 2px 6px -4px #999;\n  cursor: default;\n  font-size: 14px;\n  left: 62px;\n  opacity: 0;\n  pointer-events: none;\n  position: absolute;\n  top: 20px;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  white-space: nowrap;\n  z-index: 12;\n  transition: .15s ease all\n}\n\n.apexcharts-tooltip.apexcharts-active {\n  opacity: 1;\n  transition: .15s ease all\n}\n\n.apexcharts-tooltip.apexcharts-theme-light {\n  border: 1px solid #e3e3e3;\n  background: rgba(255,255,255,.96)\n}\n\n.apexcharts-tooltip.apexcharts-theme-dark {\n  color: #fff;\n  background: rgba(30,30,30,.8)\n}\n\n.apexcharts-tooltip * {\n  font-family: inherit\n}\n\n.apexcharts-tooltip-title {\n  padding: 6px;\n  font-size: 15px;\n  margin-bottom: 4px\n}\n\n.apexcharts-tooltip.apexcharts-theme-light .apexcharts-tooltip-title {\n  background: #eceff1;\n  border-bottom: 1px solid #ddd\n}\n\n.apexcharts-tooltip.apexcharts-theme-dark .apexcharts-tooltip-title {\n  background: rgba(0,0,0,.7);\n  border-bottom: 1px solid #333\n}\n\n.apexcharts-tooltip-text-goals-value,.apexcharts-tooltip-text-y-value,.apexcharts-tooltip-text-z-value {\n  display: inline-block;\n  margin-left: 5px;\n  font-weight: 600\n}\n\n.apexcharts-tooltip-text-goals-label:empty,.apexcharts-tooltip-text-goals-value:empty,.apexcharts-tooltip-text-y-label:empty,.apexcharts-tooltip-text-y-value:empty,.apexcharts-tooltip-text-z-value:empty,.apexcharts-tooltip-title:empty {\n  display: none\n}\n\n.apexcharts-tooltip-text-goals-label,.apexcharts-tooltip-text-goals-value {\n  padding: 6px 0 5px\n}\n\n.apexcharts-tooltip-goals-group,.apexcharts-tooltip-text-goals-label,.apexcharts-tooltip-text-goals-value {\n  display: flex\n}\n\n.apexcharts-tooltip-text-goals-label:not(:empty),.apexcharts-tooltip-text-goals-value:not(:empty) {\n  margin-top: -6px\n}\n\n.apexcharts-tooltip-marker {\n  width: 12px;\n  height: 12px;\n  position: relative;\n  top: 0;\n  margin-right: 10px;\n  border-radius: 50%\n}\n\n.apexcharts-tooltip-series-group {\n  padding: 0 10px;\n  display: none;\n  text-align: left;\n  justify-content: left;\n  align-items: center\n}\n\n.apexcharts-tooltip-series-group.apexcharts-active .apexcharts-tooltip-marker {\n  opacity: 1\n}\n\n.apexcharts-tooltip-series-group.apexcharts-active,.apexcharts-tooltip-series-group:last-child {\n  padding-bottom: 4px\n}\n\n.apexcharts-tooltip-series-group-hidden {\n  opacity: 0;\n  height: 0;\n  line-height: 0;\n  padding: 0!important\n}\n\n.apexcharts-tooltip-y-group {\n  padding: 6px 0 5px\n}\n\n.apexcharts-custom-tooltip,.apexcharts-tooltip-box {\n  padding: 4px 8px\n}\n\n.apexcharts-tooltip-boxPlot {\n  display: flex;\n  flex-direction: column-reverse\n}\n\n.apexcharts-tooltip-box>div {\n  margin: 4px 0\n}\n\n.apexcharts-tooltip-box span.value {\n  font-weight: 700\n}\n\n.apexcharts-tooltip-rangebar {\n  padding: 5px 8px\n}\n\n.apexcharts-tooltip-rangebar .category {\n  font-weight: 600;\n  color: #777\n}\n\n.apexcharts-tooltip-rangebar .series-name {\n  font-weight: 700;\n  display: block;\n  margin-bottom: 5px\n}\n\n.apexcharts-xaxistooltip,.apexcharts-yaxistooltip {\n  opacity: 0;\n  pointer-events: none;\n  color: #373d3f;\n  font-size: 13px;\n  text-align: center;\n  border-radius: 2px;\n  position: absolute;\n  z-index: 10;\n  background: #eceff1;\n  border: 1px solid #90a4ae\n}\n\n.apexcharts-xaxistooltip {\n  padding: 9px 10px;\n  transition: .15s ease all\n}\n\n.apexcharts-xaxistooltip.apexcharts-theme-dark {\n  background: rgba(0,0,0,.7);\n  border: 1px solid rgba(0,0,0,.5);\n  color: #fff\n}\n\n.apexcharts-xaxistooltip:after,.apexcharts-xaxistooltip:before {\n  left: 50%;\n  border: solid transparent;\n  content: " ";\n  height: 0;\n  width: 0;\n  position: absolute;\n  pointer-events: none\n}\n\n.apexcharts-xaxistooltip:after {\n  border-color: transparent;\n  border-width: 6px;\n  margin-left: -6px\n}\n\n.apexcharts-xaxistooltip:before {\n  border-color: transparent;\n  border-width: 7px;\n  margin-left: -7px\n}\n\n.apexcharts-xaxistooltip-bottom:after,.apexcharts-xaxistooltip-bottom:before {\n  bottom: 100%\n}\n\n.apexcharts-xaxistooltip-top:after,.apexcharts-xaxistooltip-top:before {\n  top: 100%\n}\n\n.apexcharts-xaxistooltip-bottom:after {\n  border-bottom-color: #eceff1\n}\n\n.apexcharts-xaxistooltip-bottom:before {\n  border-bottom-color: #90a4ae\n}\n\n.apexcharts-xaxistooltip-bottom.apexcharts-theme-dark:after,.apexcharts-xaxistooltip-bottom.apexcharts-theme-dark:before {\n  border-bottom-color: rgba(0,0,0,.5)\n}\n\n.apexcharts-xaxistooltip-top:after {\n  border-top-color: #eceff1\n}\n\n.apexcharts-xaxistooltip-top:before {\n  border-top-color: #90a4ae\n}\n\n.apexcharts-xaxistooltip-top.apexcharts-theme-dark:after,.apexcharts-xaxistooltip-top.apexcharts-theme-dark:before {\n  border-top-color: rgba(0,0,0,.5)\n}\n\n.apexcharts-xaxistooltip.apexcharts-active {\n  opacity: 1;\n  transition: .15s ease all\n}\n\n.apexcharts-yaxistooltip {\n  padding: 4px 10px\n}\n\n.apexcharts-yaxistooltip.apexcharts-theme-dark {\n  background: rgba(0,0,0,.7);\n  border: 1px solid rgba(0,0,0,.5);\n  color: #fff\n}\n\n.apexcharts-yaxistooltip:after,.apexcharts-yaxistooltip:before {\n  top: 50%;\n  border: solid transparent;\n  content: " ";\n  height: 0;\n  width: 0;\n  position: absolute;\n  pointer-events: none\n}\n\n.apexcharts-yaxistooltip:after {\n  border-color: transparent;\n  border-width: 6px;\n  margin-top: -6px\n}\n\n.apexcharts-yaxistooltip:before {\n  border-color: transparent;\n  border-width: 7px;\n  margin-top: -7px\n}\n\n.apexcharts-yaxistooltip-left:after,.apexcharts-yaxistooltip-left:before {\n  left: 100%\n}\n\n.apexcharts-yaxistooltip-right:after,.apexcharts-yaxistooltip-right:before {\n  right: 100%\n}\n\n.apexcharts-yaxistooltip-left:after {\n  border-left-color: #eceff1\n}\n\n.apexcharts-yaxistooltip-left:before {\n  border-left-color: #90a4ae\n}\n\n.apexcharts-yaxistooltip-left.apexcharts-theme-dark:after,.apexcharts-yaxistooltip-left.apexcharts-theme-dark:before {\n  border-left-color: rgba(0,0,0,.5)\n}\n\n.apexcharts-yaxistooltip-right:after {\n  border-right-color: #eceff1\n}\n\n.apexcharts-yaxistooltip-right:before {\n  border-right-color: #90a4ae\n}\n\n.apexcharts-yaxistooltip-right.apexcharts-theme-dark:after,.apexcharts-yaxistooltip-right.apexcharts-theme-dark:before {\n  border-right-color: rgba(0,0,0,.5)\n}\n\n.apexcharts-yaxistooltip.apexcharts-active {\n  opacity: 1\n}\n\n.apexcharts-yaxistooltip-hidden {\n  display: none\n}\n\n.apexcharts-xcrosshairs,.apexcharts-ycrosshairs {\n  pointer-events: none;\n  opacity: 0;\n  transition: .15s ease all\n}\n\n.apexcharts-xcrosshairs.apexcharts-active,.apexcharts-ycrosshairs.apexcharts-active {\n  opacity: 1;\n  transition: .15s ease all\n}\n\n.apexcharts-ycrosshairs-hidden {\n  opacity: 0\n}\n\n.apexcharts-selection-rect {\n  cursor: move\n}\n\n.svg_select_boundingRect,.svg_select_points_rot {\n  pointer-events: none;\n  opacity: 0;\n  visibility: hidden\n}\n\n.apexcharts-selection-rect+g .svg_select_boundingRect,.apexcharts-selection-rect+g .svg_select_points_rot {\n  opacity: 0;\n  visibility: hidden\n}\n\n.apexcharts-selection-rect+g .svg_select_points_l,.apexcharts-selection-rect+g .svg_select_points_r {\n  cursor: ew-resize;\n  opacity: 1;\n  visibility: visible\n}\n\n.svg_select_points {\n  fill: #efefef;\n  stroke: #333;\n  rx: 2\n}\n\n.apexcharts-svg.apexcharts-zoomable.hovering-zoom {\n  cursor: crosshair\n}\n\n.apexcharts-svg.apexcharts-zoomable.hovering-pan {\n  cursor: move\n}\n\n.apexcharts-menu-icon,.apexcharts-pan-icon,.apexcharts-reset-icon,.apexcharts-selection-icon,.apexcharts-toolbar-custom-icon,.apexcharts-zoom-icon,.apexcharts-zoomin-icon,.apexcharts-zoomout-icon {\n  cursor: pointer;\n  width: 20px;\n  height: 20px;\n  line-height: 24px;\n  color: #6e8192;\n  text-align: center\n}\n\n.apexcharts-menu-icon svg,.apexcharts-reset-icon svg,.apexcharts-zoom-icon svg,.apexcharts-zoomin-icon svg,.apexcharts-zoomout-icon svg {\n  fill: #6e8192\n}\n\n.apexcharts-selection-icon svg {\n  fill: #444;\n  transform: scale(.76)\n}\n\n.apexcharts-theme-dark .apexcharts-menu-icon svg,.apexcharts-theme-dark .apexcharts-pan-icon svg,.apexcharts-theme-dark .apexcharts-reset-icon svg,.apexcharts-theme-dark .apexcharts-selection-icon svg,.apexcharts-theme-dark .apexcharts-toolbar-custom-icon svg,.apexcharts-theme-dark .apexcharts-zoom-icon svg,.apexcharts-theme-dark .apexcharts-zoomin-icon svg,.apexcharts-theme-dark .apexcharts-zoomout-icon svg {\n  fill: #f3f4f5\n}\n\n.apexcharts-canvas .apexcharts-reset-zoom-icon.apexcharts-selected svg,.apexcharts-canvas .apexcharts-selection-icon.apexcharts-selected svg,.apexcharts-canvas .apexcharts-zoom-icon.apexcharts-selected svg {\n  fill: #008ffb\n}\n\n.apexcharts-theme-light .apexcharts-menu-icon:hover svg,.apexcharts-theme-light .apexcharts-reset-icon:hover svg,.apexcharts-theme-light .apexcharts-selection-icon:not(.apexcharts-selected):hover svg,.apexcharts-theme-light .apexcharts-zoom-icon:not(.apexcharts-selected):hover svg,.apexcharts-theme-light .apexcharts-zoomin-icon:hover svg,.apexcharts-theme-light .apexcharts-zoomout-icon:hover svg {\n  fill: #333\n}\n\n.apexcharts-menu-icon,.apexcharts-selection-icon {\n  position: relative\n}\n\n.apexcharts-reset-icon {\n  margin-left: 5px\n}\n\n.apexcharts-menu-icon,.apexcharts-reset-icon,.apexcharts-zoom-icon {\n  transform: scale(.85)\n}\n\n.apexcharts-zoomin-icon,.apexcharts-zoomout-icon {\n  transform: scale(.7)\n}\n\n.apexcharts-zoomout-icon {\n  margin-right: 3px\n}\n\n.apexcharts-pan-icon {\n  transform: scale(.62);\n  position: relative;\n  left: 1px;\n  top: 0\n}\n\n.apexcharts-pan-icon svg {\n  fill: #fff;\n  stroke: #6e8192;\n  stroke-width: 2\n}\n\n.apexcharts-pan-icon.apexcharts-selected svg {\n  stroke: #008ffb\n}\n\n.apexcharts-pan-icon:not(.apexcharts-selected):hover svg {\n  stroke: #333\n}\n\n.apexcharts-toolbar {\n  position: absolute;\n  z-index: 11;\n  max-width: 176px;\n  text-align: right;\n  border-radius: 3px;\n  padding: 0 6px 2px;\n  display: flex;\n  justify-content: space-between;\n  align-items: center\n}\n\n.apexcharts-menu {\n  background: #fff;\n  position: absolute;\n  top: 100%;\n  border: 1px solid #ddd;\n  border-radius: 3px;\n  padding: 3px;\n  right: 10px;\n  opacity: 0;\n  min-width: 110px;\n  transition: .15s ease all;\n  pointer-events: none\n}\n\n.apexcharts-menu.apexcharts-menu-open {\n  opacity: 1;\n  pointer-events: all;\n  transition: .15s ease all\n}\n\n.apexcharts-menu-item {\n  padding: 6px 7px;\n  font-size: 12px;\n  cursor: pointer\n}\n\n.apexcharts-theme-light .apexcharts-menu-item:hover {\n  background: #eee\n}\n\n.apexcharts-theme-dark .apexcharts-menu {\n  background: rgba(0,0,0,.7);\n  color: #fff\n}\n\n@media screen and (min-width:768px) {\n  .apexcharts-canvas:hover .apexcharts-toolbar {\n      opacity: 1\n  }\n}\n\n.apexcharts-canvas .apexcharts-element-hidden,.apexcharts-datalabel.apexcharts-element-hidden,.apexcharts-hide .apexcharts-series-points {\n  opacity: 0\n}\n\n.apexcharts-hidden-element-shown {\n  opacity: 1;\n  transition: 0.25s ease all;\n}\n.apexcharts-datalabel,.apexcharts-datalabel-label,.apexcharts-datalabel-value,.apexcharts-datalabels,.apexcharts-pie-label {\n  cursor: default;\n  pointer-events: none\n}\n\n.apexcharts-pie-label-delay {\n  opacity: 0;\n  animation-name: opaque;\n  animation-duration: .3s;\n  animation-fill-mode: forwards;\n  animation-timing-function: ease\n}\n\n.apexcharts-annotation-rect,.apexcharts-area-series .apexcharts-area,.apexcharts-area-series .apexcharts-series-markers .apexcharts-marker.no-pointer-events,.apexcharts-gridline,.apexcharts-line,.apexcharts-line-series .apexcharts-series-markers .apexcharts-marker.no-pointer-events,.apexcharts-point-annotation-label,.apexcharts-radar-series path,.apexcharts-radar-series polygon,.apexcharts-toolbar svg,.apexcharts-tooltip .apexcharts-marker,.apexcharts-xaxis-annotation-label,.apexcharts-yaxis-annotation-label,.apexcharts-zoom-rect {\n  pointer-events: none\n}\n\n.apexcharts-marker {\n  transition: .15s ease all\n}\n\n.resize-triggers {\n  animation: 1ms resizeanim;\n  visibility: hidden;\n  opacity: 0;\n  height: 100%;\n  width: 100%;\n  overflow: hidden\n}\n\n.contract-trigger:before,.resize-triggers,.resize-triggers>div {\n  content: " ";\n  display: block;\n  position: absolute;\n  top: 0;\n  left: 0\n}\n\n.resize-triggers>div {\n  height: 100%;\n  width: 100%;\n  background: #eee;\n  overflow: auto\n}\n\n.contract-trigger:before {\n  overflow: hidden;\n  width: 200%;\n  height: 200%\n}\n\n.apexcharts-bar-goals-markers{\n  pointer-events: none\n}\n\n.apexcharts-bar-shadows{\n  pointer-events: none\n}\n\n.apexcharts-rangebar-goals-markers{\n  pointer-events: none\n}',r?s.prepend(t.css):o.head.appendChild(t.css));}var l=t.create(t.w.config.series,{});if(!l)return e(t);t.mount(l).then(function(){"function"==typeof t.w.config.chart.events.mounted&&t.w.config.chart.events.mounted(t,t.w),t.events.fireEvent("mounted",[t,t.w]),e(l);}).catch(function(t){i(t);});}else i(new Error("Element not found"));});}},{key:"create",value:function(t,e){var i=this.w;new Gt(this).initModules();var a=this.w.globals;(a.noData=!1,a.animationEnded=!1,this.responsive.checkResponsiveConfig(e),i.config.xaxis.convertedCatToNumeric)&&new z(i.config).convertCatToNumericXaxis(i.config,this.ctx);if(null===this.el)return a.animationEnded=!0,null;if(this.core.setupElements(),"treemap"===i.config.chart.type&&(i.config.grid.show=!1,i.config.yaxis[0].show=!1),0===a.svgWidth)return a.animationEnded=!0,null;var s=y.checkComboSeries(t);a.comboCharts=s.comboCharts,a.comboBarCount=s.comboBarCount;var r=t.every(function(t){return t.data&&0===t.data.length;});(0===t.length||r)&&this.series.handleNoData(),this.events.setupEventHandlers(),this.data.parseData(t),this.theme.init(),new H(this).setGlobalMarkerSize(),this.formatters.setLabelFormatters(),this.titleSubtitle.draw(),a.noData&&a.collapsedSeries.length!==a.series.length&&!i.config.legend.showForSingleSeries||this.legend.init(),this.series.hasAllSeriesEqualX(),a.axisCharts&&(this.core.coreCalculations(),"category"!==i.config.xaxis.type&&this.formatters.setLabelFormatters(),this.ctx.toolbar.minX=i.globals.minX,this.ctx.toolbar.maxX=i.globals.maxX),this.formatters.heatmapLabelFormatters(),new y(this).getLargestMarkerSize(),this.dimensions.plotCoords();var o=this.core.xySettings();this.grid.createGridMask();var n=this.core.plotChartType(t,o),l=new O(this);return l.bringForward(),i.config.dataLabels.background.enabled&&l.dataLabelsBackground(),this.core.shiftGraphPosition(),{elGraph:n,xyRatios:o,dimensions:{plot:{left:i.globals.translateX,top:i.globals.translateY,width:i.globals.gridWidth,height:i.globals.gridHeight}}};}},{key:"mount",value:function(){var t=this,e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:null,i=this,a=i.w;return new Promise(function(s,r){if(null===i.el)return r(new Error("Not enough data to display or target element not found"));(null===e||a.globals.allSeriesCollapsed)&&i.series.handleNoData(),i.grid=new j(i);var o,n,l=i.grid.drawGrid();(i.annotations=new P(i),i.annotations.drawImageAnnos(),i.annotations.drawTextAnnos(),"back"===a.config.grid.position)&&(l&&a.globals.dom.elGraphical.add(l.el),null!=l&&null!==(o=l.elGridBorders)&&void 0!==o&&o.node&&a.globals.dom.elGraphical.add(l.elGridBorders));if(Array.isArray(e.elGraph))for(var h=0;h<e.elGraph.length;h++)a.globals.dom.elGraphical.add(e.elGraph[h]);else a.globals.dom.elGraphical.add(e.elGraph);"front"===a.config.grid.position&&(l&&a.globals.dom.elGraphical.add(l.el),null!=l&&null!==(n=l.elGridBorders)&&void 0!==n&&n.node&&a.globals.dom.elGraphical.add(l.elGridBorders));"front"===a.config.xaxis.crosshairs.position&&i.crosshairs.drawXCrosshairs(),"front"===a.config.yaxis[0].crosshairs.position&&i.crosshairs.drawYCrosshairs(),"treemap"!==a.config.chart.type&&i.axes.drawAxis(a.config.chart.type,l);var c=new V(t.ctx,l),d=new q(t.ctx,l);if(null!==l&&(c.xAxisLabelCorrections(l.xAxisTickWidth),d.setYAxisTextAlignments(),a.config.yaxis.map(function(t,e){-1===a.globals.ignoreYAxisIndexes.indexOf(e)&&d.yAxisTitleRotate(e,t.opposite);})),i.annotations.drawAxesAnnotations(),!a.globals.noData){if(a.config.tooltip.enabled&&!a.globals.noData&&i.w.globals.tooltip.drawTooltip(e.xyRatios),a.globals.axisCharts&&(a.globals.isXNumeric||a.config.xaxis.convertedCatToNumeric||a.globals.isRangeBar))(a.config.chart.zoom.enabled||a.config.chart.selection&&a.config.chart.selection.enabled||a.config.chart.pan&&a.config.chart.pan.enabled)&&i.zoomPanSelection.init({xyRatios:e.xyRatios});else {var g=a.config.chart.toolbar.tools;["zoom","zoomin","zoomout","selection","pan","reset"].forEach(function(t){g[t]=!1;});}a.config.chart.toolbar.show&&!a.globals.allSeriesCollapsed&&i.toolbar.createToolbar();}a.globals.memory.methodsToExec.length>0&&a.globals.memory.methodsToExec.forEach(function(t){t.method(t.params,!1,t.context);}),a.globals.axisCharts||a.globals.noData||i.core.resizeNonAxisCharts(),s(i);});}},{key:"destroy",value:function(){var t,e;window.removeEventListener("resize",this.windowResizeHandler),this.el.parentNode,t=this.parentResizeHandler,(e=jt.get(t))&&(e.disconnect(),jt.delete(t));var i=this.w.config.chart.id;i&&Apex._chartInstances.forEach(function(t,e){t.id===x.escapeString(i)&&Apex._chartInstances.splice(e,1);}),new Vt(this.ctx).clear({isUpdating:!1});}},{key:"updateOptions",value:function(t){var e=this,i=arguments.length>1&&void 0!==arguments[1]&&arguments[1],a=!(arguments.length>2&&void 0!==arguments[2])||arguments[2],s=!(arguments.length>3&&void 0!==arguments[3])||arguments[3],r=!(arguments.length>4&&void 0!==arguments[4])||arguments[4],o=this.w;return o.globals.selection=void 0,t.series&&(this.series.resetSeries(!1,!0,!1),t.series.length&&t.series[0].data&&(t.series=t.series.map(function(t,i){return e.updateHelpers._extendSeries(t,i);})),this.updateHelpers.revertDefaultAxisMinMax()),t.xaxis&&(t=this.updateHelpers.forceXAxisUpdate(t)),t.yaxis&&(t=this.updateHelpers.forceYAxisUpdate(t)),o.globals.collapsedSeriesIndices.length>0&&this.series.clearPreviousPaths(),t.theme&&(t=this.theme.updateThemeOptions(t)),this.updateHelpers._updateOptions(t,i,a,s,r);}},{key:"updateSeries",value:function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:[],e=!(arguments.length>1&&void 0!==arguments[1])||arguments[1],i=!(arguments.length>2&&void 0!==arguments[2])||arguments[2];return this.series.resetSeries(!1),this.updateHelpers.revertDefaultAxisMinMax(),this.updateHelpers._updateSeries(t,e,i);}},{key:"appendSeries",value:function(t){var e=!(arguments.length>1&&void 0!==arguments[1])||arguments[1],i=!(arguments.length>2&&void 0!==arguments[2])||arguments[2],a=this.w.config.series.slice();return a.push(t),this.series.resetSeries(!1),this.updateHelpers.revertDefaultAxisMinMax(),this.updateHelpers._updateSeries(a,e,i);}},{key:"appendData",value:function(t){var e=!(arguments.length>1&&void 0!==arguments[1])||arguments[1],i=this;i.w.globals.dataChanged=!0,i.series.getPreviousPaths();for(var a=i.w.config.series.slice(),s=0;s<a.length;s++)if(null!==t[s]&&void 0!==t[s])for(var r=0;r<t[s].data.length;r++)a[s].data.push(t[s].data[r]);return i.w.config.series=a,e&&(i.w.globals.initialSeries=x.clone(i.w.config.series)),this.update();}},{key:"update",value:function(t){var e=this;return new Promise(function(i,a){new Vt(e.ctx).clear({isUpdating:!0});var s=e.create(e.w.config.series,t);if(!s)return i(e);e.mount(s).then(function(){"function"==typeof e.w.config.chart.events.updated&&e.w.config.chart.events.updated(e,e.w),e.events.fireEvent("updated",[e,e.w]),e.w.globals.isDirty=!0,i(e);}).catch(function(t){a(t);});});}},{key:"getSyncedCharts",value:function(){var t=this.getGroupedCharts(),e=[this];return t.length&&(e=[],t.forEach(function(t){e.push(t);})),e;}},{key:"getGroupedCharts",value:function(){var t=this;return Apex._chartInstances.filter(function(t){if(t.group)return !0;}).map(function(e){return t.w.config.chart.group===e.group?e.chart:t;});}},{key:"toggleSeries",value:function(t){return this.series.toggleSeries(t);}},{key:"highlightSeriesOnLegendHover",value:function(t,e){return this.series.toggleSeriesOnHover(t,e);}},{key:"showSeries",value:function(t){this.series.showSeries(t);}},{key:"hideSeries",value:function(t){this.series.hideSeries(t);}},{key:"resetSeries",value:function(){var t=!(arguments.length>0&&void 0!==arguments[0])||arguments[0],e=!(arguments.length>1&&void 0!==arguments[1])||arguments[1];this.series.resetSeries(t,e);}},{key:"addEventListener",value:function(t,e){this.events.addEventListener(t,e);}},{key:"removeEventListener",value:function(t,e){this.events.removeEventListener(t,e);}},{key:"addXaxisAnnotation",value:function(t){var e=!(arguments.length>1&&void 0!==arguments[1])||arguments[1],i=arguments.length>2&&void 0!==arguments[2]?arguments[2]:void 0,a=this;i&&(a=i),a.annotations.addXaxisAnnotationExternal(t,e,a);}},{key:"addYaxisAnnotation",value:function(t){var e=!(arguments.length>1&&void 0!==arguments[1])||arguments[1],i=arguments.length>2&&void 0!==arguments[2]?arguments[2]:void 0,a=this;i&&(a=i),a.annotations.addYaxisAnnotationExternal(t,e,a);}},{key:"addPointAnnotation",value:function(t){var e=!(arguments.length>1&&void 0!==arguments[1])||arguments[1],i=arguments.length>2&&void 0!==arguments[2]?arguments[2]:void 0,a=this;i&&(a=i),a.annotations.addPointAnnotationExternal(t,e,a);}},{key:"clearAnnotations",value:function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:void 0,e=this;t&&(e=t),e.annotations.clearAnnotations(e);}},{key:"removeAnnotation",value:function(t){var e=arguments.length>1&&void 0!==arguments[1]?arguments[1]:void 0,i=this;e&&(i=e),i.annotations.removeAnnotation(i,t);}},{key:"getChartArea",value:function(){return this.w.globals.dom.baseEl.querySelector(".apexcharts-inner");}},{key:"getSeriesTotalXRange",value:function(t,e){return this.coreUtils.getSeriesTotalsXRange(t,e);}},{key:"getHighestValueInSeries",value:function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:0;return new U(this.ctx).getMinYMaxY(t).highestY;}},{key:"getLowestValueInSeries",value:function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:0;return new U(this.ctx).getMinYMaxY(t).lowestY;}},{key:"getSeriesTotal",value:function(){return this.w.globals.seriesTotals;}},{key:"toggleDataPointSelection",value:function(t,e){return this.updateHelpers.toggleDataPointSelection(t,e);}},{key:"zoomX",value:function(t,e){this.ctx.toolbar.zoomUpdateOptions(t,e);}},{key:"setLocale",value:function(t){this.localization.setCurrentLocaleValues(t);}},{key:"dataURI",value:function(t){return new G(this.ctx).dataURI(t);}},{key:"exportToCSV",value:function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{};return new G(this.ctx).exportToCSV(t);}},{key:"paper",value:function(){return this.w.globals.dom.Paper;}},{key:"_parentResizeCallback",value:function(){this.w.globals.animationEnded&&this.w.config.chart.redrawOnParentResize&&this._windowResize();}},{key:"_windowResize",value:function(){var t=this;clearTimeout(this.w.globals.resizeTimer),this.w.globals.resizeTimer=window.setTimeout(function(){t.w.globals.resized=!0,t.w.globals.dataChanged=!1,t.ctx.update();},150);}},{key:"_windowResizeHandler",value:function(){var t=this.w.config.chart.redrawOnWindowResize;"function"==typeof t&&(t=t()),t&&this._windowResize();}}],[{key:"getChartByID",value:function(t){var e=x.escapeString(t),i=Apex._chartInstances.filter(function(t){return t.id===e;})[0];return i&&i.chart;}},{key:"initOnLoad",value:function(){for(var e=document.querySelectorAll("[data-apexcharts]"),i=0;i<e.length;i++){new t(e[i],JSON.parse(e[i].getAttribute("data-options"))).render();}}},{key:"exec",value:function(t,e){var i=this.getChartByID(t);if(i){i.w.globals.isExecCalled=!0;var a=null;if(-1!==i.publicMethods.indexOf(e)){for(var s=arguments.length,r=new Array(s>2?s-2:0),o=2;o<s;o++)r[o-2]=arguments[o];a=i[e].apply(i,r);}return a;}}},{key:"merge",value:function(t,e){return x.extend(t,e);}}]),t;}();
 
-  coreuiChart.type.pie = {
+  var TypePie = {
     _options: {},
     _apexOptions: {},
     _apex: null,
@@ -2729,7 +2713,7 @@
      */
     render: function render(container) {
       this._buildApexOptions();
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.debug) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.debug) {
         console.log($.extend(true, {}, this._apexOptions));
       }
       this._apex = new _t(container, this._apexOptions);
@@ -2751,14 +2735,14 @@
       this._apexOptions.chart.type = 'pie';
 
       // Styles
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && coreuiChartUtils.isObject(this._options.options.style)) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && ChartUtils.isObject(this._options.options.style)) {
         style = this._options.options.style;
       }
 
       // Datasets
-      if (this._options.hasOwnProperty('datasets') && coreuiChartUtils.isArray(this._options.datasets)) {
+      if (this._options.hasOwnProperty('datasets') && ChartUtils.isArray(this._options.datasets)) {
         $.each(this._options.datasets, function (key, dataset) {
-          if (!coreuiChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || typeof dataset.type !== 'string') {
+          if (!ChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || typeof dataset.type !== 'string') {
             return;
           }
           if (['pie', 'donut', 'radialBar'].indexOf(dataset.type) >= 0) {
@@ -2843,7 +2827,7 @@
                 return style.total.formatter(w.globals.seriesTotals);
               };
             } else if (typeof style.total.formatter === 'string') {
-              var func = coreuiChartUtils.getFunctionByName(style.total.formatter);
+              var func = ChartUtils.getFunctionByName(style.total.formatter);
               if (typeof func === 'function') {
                 this._apexOptions.plotOptions.pie.donut.labels.total.formatter = function (w) {
                   return func(w.globals.seriesTotals);
@@ -2876,7 +2860,7 @@
                 return style.total.formatter(w.globals.seriesTotals);
               };
             } else if (typeof style.total.formatter === 'string') {
-              var _func = coreuiChartUtils.getFunctionByName(style.total.formatter);
+              var _func = ChartUtils.getFunctionByName(style.total.formatter);
               if (typeof _func === 'function') {
                 this._apexOptions.plotOptions.radialBar.dataLabels.total.formatter = function (w) {
                   return _func(w.globals.seriesTotals);
@@ -2901,7 +2885,7 @@
     }
   };
 
-  coreuiChart.type.line = {
+  var TypeLine = {
     _options: {},
     _apexOptions: {},
     _apex: null,
@@ -2924,7 +2908,7 @@
      */
     render: function render(container) {
       this._buildApexOptions();
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.debug) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.debug) {
         console.log($.extend(true, {}, this._apexOptions));
       }
       this._apex = new _t(container, this._apexOptions);
@@ -2948,7 +2932,7 @@
         that._datasets.push(dataset);
       });
       this._fixMarkers(this._apexOptions);
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.debug) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.debug) {
         console.log($.extend(true, {}, this._apexOptions));
       }
       this._apex.updateOptions($.extend(true, {}, this._apexOptions));
@@ -3003,7 +2987,7 @@
       this._apexOptions.markers.size.splice(datasetKey, 1);
       this._apexOptions.colors.splice(datasetKey, 1);
       this._apexOptions.series.splice(datasetKey, 1);
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.debug) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.debug) {
         console.log($.extend(true, {}, this._apexOptions));
       }
       this._apex.updateOptions($.extend(true, {}, this._apexOptions));
@@ -3069,11 +3053,11 @@
      * @returns {string|null}
      */
     addAnnotation: function addAnnotation(annotation) {
-      if (!coreuiChartUtils.isObject(annotation) || !annotation.hasOwnProperty('type') || typeof annotation.type !== 'string' || ['yLine', 'xLine', 'point'].indexOf(annotation.type) < 0) {
+      if (!ChartUtils.isObject(annotation) || !annotation.hasOwnProperty('type') || typeof annotation.type !== 'string' || ['yLine', 'xLine', 'point'].indexOf(annotation.type) < 0) {
         return null;
       }
       if (typeof annotation.id !== 'string') {
-        annotation.id = coreuiChartUtils.hashCode();
+        annotation.id = ChartUtils.hashCode();
       }
       switch (annotation.type) {
         case 'yLine':
@@ -3124,12 +3108,12 @@
       this._apexOptions.chart.type = 'area';
 
       // Styles
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && coreuiChartUtils.isObject(this._options.options.style)) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && ChartUtils.isObject(this._options.options.style)) {
         this._setOptionsStyles(this._options.options.style);
       }
 
       // Datasets
-      if (this._options.hasOwnProperty('datasets') && coreuiChartUtils.isArray(this._options.datasets)) {
+      if (this._options.hasOwnProperty('datasets') && ChartUtils.isArray(this._options.datasets)) {
         $.each(this._options.datasets, function (key, dataset) {
           var apexOptions = that._getDatasetOptions(dataset);
           if (apexOptions !== null) {
@@ -3139,14 +3123,14 @@
         });
         this._fixMarkers(this._apexOptions);
       }
-      if (this._options.hasOwnProperty('annotations') && coreuiChartUtils.isArray(this._options.annotations)) {
+      if (this._options.hasOwnProperty('annotations') && ChartUtils.isArray(this._options.annotations)) {
         $.each(this._options.annotations, function (key, annotation) {
-          if (!coreuiChartUtils.isObject(annotation) || !annotation.hasOwnProperty('type') || typeof annotation.type !== 'string') {
+          if (!ChartUtils.isObject(annotation) || !annotation.hasOwnProperty('type') || typeof annotation.type !== 'string') {
             return;
           }
           if (['yLine', 'xLine', 'point'].indexOf(annotation.type) >= 0) {
             if (typeof annotation.id !== 'string') {
-              annotation.id = coreuiChartUtils.hashCode();
+              annotation.id = ChartUtils.hashCode();
             }
             switch (annotation.type) {
               case 'yLine':
@@ -3180,7 +3164,7 @@
      */
     _setOptionsStyles: function _setOptionsStyles(style) {
       var issetNoBar = false;
-      if (this._options.hasOwnProperty('datasets') && coreuiChartUtils.isArray(this._options.datasets)) {
+      if (this._options.hasOwnProperty('datasets') && ChartUtils.isArray(this._options.datasets)) {
         $.each(this._options.datasets, function (key, dataset) {
           if (dataset.hasOwnProperty('type') && dataset.type !== 'bar') {
             issetNoBar = true;
@@ -3222,7 +3206,7 @@
      * @private
      */
     _getDatasetOptions: function _getDatasetOptions(dataset) {
-      if (!coreuiChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || !dataset.hasOwnProperty('name') || typeof dataset.type !== 'string' || typeof dataset.name !== 'string' || ['line', 'bar', 'points'].indexOf(dataset.type) < 0) {
+      if (!ChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || !dataset.hasOwnProperty('name') || typeof dataset.type !== 'string' || typeof dataset.name !== 'string' || ['line', 'bar', 'points'].indexOf(dataset.type) < 0) {
         return null;
       }
       var color = null;
@@ -3239,7 +3223,7 @@
       var apexOptions = $.extend(true, {}, this._apexOptions);
 
       // Styles
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && coreuiChartUtils.isObject(this._options.options.style)) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && ChartUtils.isObject(this._options.options.style)) {
         style = this._options.options.style;
       }
       switch (dataset.type) {
@@ -3302,7 +3286,7 @@
       }
 
       // Dataset style
-      if (dataset.hasOwnProperty('style') && coreuiChartUtils.isObject(dataset.style)) {
+      if (dataset.hasOwnProperty('style') && ChartUtils.isObject(dataset.style)) {
         if (dataset.style.hasOwnProperty('color') && typeof dataset.style.color === 'string') {
           color = dataset.style.color;
         }
@@ -3415,14 +3399,14 @@
       }
 
       // Events
-      if (annotation.hasOwnProperty('events') && coreuiChartUtils.isObject(annotation.events)) {
+      if (annotation.hasOwnProperty('events') && ChartUtils.isObject(annotation.events)) {
         if (annotation.events.hasOwnProperty('mouseEnter')) {
           if (typeof annotation.events.mouseEnter === 'function') {
             yLine.label.mouseEnter = function () {
               annotation.events.mouseEnter(annotation);
             };
           } else if (typeof annotation.events.mouseEnter === 'string') {
-            var func = coreuiChartUtils.getFunctionByName(annotation.events.mouseEnter);
+            var func = ChartUtils.getFunctionByName(annotation.events.mouseEnter);
             if (typeof func === 'function') {
               yLine.label.mouseEnter = function () {
                 func(annotation);
@@ -3436,7 +3420,7 @@
               annotation.events.mouseLeave(annotation);
             };
           } else if (typeof annotation.events.mouseLeave === 'string') {
-            var _func = coreuiChartUtils.getFunctionByName(annotation.events.mouseLeave);
+            var _func = ChartUtils.getFunctionByName(annotation.events.mouseLeave);
             if (typeof _func === 'function') {
               yLine.label.mouseLeave = function () {
                 _func(annotation);
@@ -3450,7 +3434,7 @@
               annotation.events.click(annotation);
             };
           } else if (typeof annotation.events.click === 'string') {
-            var _func2 = coreuiChartUtils.getFunctionByName(annotation.events.click);
+            var _func2 = ChartUtils.getFunctionByName(annotation.events.click);
             if (typeof _func2 === 'function') {
               yLine.label.click = function () {
                 _func2(annotation);
@@ -3461,7 +3445,7 @@
       }
 
       // Annotation style
-      if (annotation.hasOwnProperty('style') && coreuiChartUtils.isObject(annotation.style)) {
+      if (annotation.hasOwnProperty('style') && ChartUtils.isObject(annotation.style)) {
         if (annotation.style.hasOwnProperty('fillColor') && typeof annotation.style.fillColor === 'string') {
           yLine.fillColor = annotation.style.fillColor;
         }
@@ -3486,7 +3470,7 @@
         }
 
         // Label style
-        if (annotation.style.hasOwnProperty('label') && coreuiChartUtils.isObject(annotation.style.label)) {
+        if (annotation.style.hasOwnProperty('label') && ChartUtils.isObject(annotation.style.label)) {
           if (annotation.style.label.hasOwnProperty('color') && typeof annotation.style.label.color === 'string') {
             yLine.label.style.color = annotation.style.label.color;
           }
@@ -3540,14 +3524,14 @@
       }
 
       // Events
-      if (annotation.hasOwnProperty('events') && coreuiChartUtils.isObject(annotation.events)) {
+      if (annotation.hasOwnProperty('events') && ChartUtils.isObject(annotation.events)) {
         if (annotation.events.hasOwnProperty('mouseEnter')) {
           if (typeof annotation.events.mouseEnter === 'function') {
             xLine.label.mouseEnter = function () {
               annotation.events.mouseEnter(annotation);
             };
           } else if (typeof annotation.events.mouseEnter === 'string') {
-            var func = coreuiChartUtils.getFunctionByName(annotation.events.mouseEnter);
+            var func = ChartUtils.getFunctionByName(annotation.events.mouseEnter);
             if (typeof func === 'function') {
               xLine.label.mouseEnter = function () {
                 func(annotation);
@@ -3561,7 +3545,7 @@
               annotation.events.mouseLeave(annotation);
             };
           } else if (typeof annotation.events.mouseLeave === 'string') {
-            var _func3 = coreuiChartUtils.getFunctionByName(annotation.events.mouseLeave);
+            var _func3 = ChartUtils.getFunctionByName(annotation.events.mouseLeave);
             if (typeof _func3 === 'function') {
               xLine.label.mouseLeave = function () {
                 _func3(annotation);
@@ -3575,7 +3559,7 @@
               annotation.events.click(annotation);
             };
           } else if (typeof annotation.events.click === 'string') {
-            var _func4 = coreuiChartUtils.getFunctionByName(annotation.events.click);
+            var _func4 = ChartUtils.getFunctionByName(annotation.events.click);
             if (typeof _func4 === 'function') {
               xLine.label.click = function () {
                 _func4(annotation);
@@ -3586,7 +3570,7 @@
       }
 
       // Annotation style
-      if (annotation.hasOwnProperty('style') && coreuiChartUtils.isObject(annotation.style)) {
+      if (annotation.hasOwnProperty('style') && ChartUtils.isObject(annotation.style)) {
         if (annotation.style.hasOwnProperty('fillColor') && typeof annotation.style.fillColor === 'string') {
           xLine.fillColor = annotation.style.fillColor;
         }
@@ -3611,7 +3595,7 @@
         }
 
         // Label style
-        if (annotation.style.hasOwnProperty('label') && coreuiChartUtils.isObject(annotation.style.label)) {
+        if (annotation.style.hasOwnProperty('label') && ChartUtils.isObject(annotation.style.label)) {
           if (annotation.style.label.hasOwnProperty('color') && typeof annotation.style.label.color === 'string') {
             xLine.label.style.color = annotation.style.label.color;
           }
@@ -3668,14 +3652,14 @@
       }
 
       // Events
-      if (annotation.hasOwnProperty('events') && coreuiChartUtils.isObject(annotation.events)) {
+      if (annotation.hasOwnProperty('events') && ChartUtils.isObject(annotation.events)) {
         if (annotation.events.hasOwnProperty('mouseEnter')) {
           if (typeof annotation.events.mouseEnter === 'function') {
             point.mouseEnter = function () {
               annotation.events.mouseEnter(annotation);
             };
           } else if (typeof annotation.events.mouseEnter === 'string') {
-            var func = coreuiChartUtils.getFunctionByName(annotation.events.mouseEnter);
+            var func = ChartUtils.getFunctionByName(annotation.events.mouseEnter);
             if (typeof func === 'function') {
               point.mouseEnter = function () {
                 func(annotation);
@@ -3689,7 +3673,7 @@
               annotation.events.mouseLeave(annotation);
             };
           } else if (typeof annotation.events.mouseLeave === 'string') {
-            var _func5 = coreuiChartUtils.getFunctionByName(annotation.events.mouseLeave);
+            var _func5 = ChartUtils.getFunctionByName(annotation.events.mouseLeave);
             if (typeof _func5 === 'function') {
               point.mouseLeave = function () {
                 _func5(annotation);
@@ -3703,7 +3687,7 @@
               annotation.events.click(annotation);
             };
           } else if (typeof annotation.events.click === 'string') {
-            var _func6 = coreuiChartUtils.getFunctionByName(annotation.events.click);
+            var _func6 = ChartUtils.getFunctionByName(annotation.events.click);
             if (typeof _func6 === 'function') {
               point.click = function () {
                 _func6(annotation);
@@ -3714,7 +3698,7 @@
       }
 
       // Annotation style
-      if (annotation.hasOwnProperty('style') && coreuiChartUtils.isObject(annotation.style)) {
+      if (annotation.hasOwnProperty('style') && ChartUtils.isObject(annotation.style)) {
         if (annotation.style.hasOwnProperty('fillColor') && typeof annotation.style.fillColor === 'string') {
           point.marker.fillColor = annotation.style.fillColor;
         }
@@ -3742,7 +3726,7 @@
         }
 
         // Label style
-        if (annotation.style.hasOwnProperty('label') && coreuiChartUtils.isObject(annotation.style.label)) {
+        if (annotation.style.hasOwnProperty('label') && ChartUtils.isObject(annotation.style.label)) {
           if (annotation.style.label.hasOwnProperty('color') && typeof annotation.style.label.color === 'string') {
             point.label.style.color = annotation.style.label.color;
           }
@@ -3772,7 +3756,7 @@
     }
   };
 
-  coreuiChart.type.box = {
+  var TypeBox = {
     _options: {},
     _apexOptions: {},
     _apex: null,
@@ -3794,7 +3778,7 @@
      */
     render: function render(container) {
       this._buildApexOptions();
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.debug) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.debug) {
         console.log($.extend(true, {}, this._apexOptions));
       }
       this._apex = new _t(container, this._apexOptions);
@@ -3809,7 +3793,7 @@
       this._apexOptions.chart.type = 'boxPlot';
 
       // Styles
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && coreuiChartUtils.isObject(this._options.options.style)) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && ChartUtils.isObject(this._options.options.style)) {
         style = this._options.options.style;
         if (style.hasOwnProperty('colorUpper') && typeof style.colorUpper === 'string') {
           this._apexOptions.plotOptions.boxPlot.colors.upper = style.colorUpper;
@@ -3832,10 +3816,10 @@
       }
 
       // Datasets
-      if (this._options.hasOwnProperty('datasets') && coreuiChartUtils.isArray(this._options.datasets)) {
+      if (this._options.hasOwnProperty('datasets') && ChartUtils.isArray(this._options.datasets)) {
         var datasetNum = 0;
         $.each(this._options.datasets, function (key, dataset) {
-          if (!coreuiChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || !dataset.hasOwnProperty('name') || typeof dataset.type !== 'string' || typeof dataset.name !== 'string') {
+          if (!ChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || !dataset.hasOwnProperty('name') || typeof dataset.type !== 'string' || typeof dataset.name !== 'string') {
             return;
           }
           if (['box'].indexOf(dataset.type) >= 0) {
@@ -3879,7 +3863,7 @@
             }
 
             // Dataset style
-            if (dataset.hasOwnProperty('style') && coreuiChartUtils.isObject(dataset.style)) {
+            if (dataset.hasOwnProperty('style') && ChartUtils.isObject(dataset.style)) {
               if (dataset.style.hasOwnProperty('color') && typeof dataset.style.color === 'string') {
                 color = dataset.style.color;
               }
@@ -3916,11 +3900,11 @@
             }
             var labelNumber = 0;
             $.each(dataset.data, function (key, item) {
-              if (coreuiChartUtils.isObject(item) && item.hasOwnProperty('y')) {
+              if (ChartUtils.isObject(item) && item.hasOwnProperty('y')) {
                 var itemLabel = '';
                 if (item.hasOwnProperty('x')) {
                   itemLabel = item.x;
-                } else if (that._options.hasOwnProperty('labels') && coreuiChartUtils.isArray(that._options.labels) && that._options.labels.hasOwnProperty(labelNumber)) {
+                } else if (that._options.hasOwnProperty('labels') && ChartUtils.isArray(that._options.labels) && that._options.labels.hasOwnProperty(labelNumber)) {
                   itemLabel = that._options.labels[labelNumber];
                 } else {
                   itemLabel = labelNumber + 1;
@@ -3932,7 +3916,7 @@
                 labelNumber++;
               } else if (Array.isArray(item)) {
                 var _itemLabel = '';
-                if (that._options.hasOwnProperty('labels') && coreuiChartUtils.isArray(that._options.labels) && that._options.labels.hasOwnProperty(labelNumber)) {
+                if (that._options.hasOwnProperty('labels') && ChartUtils.isArray(that._options.labels) && that._options.labels.hasOwnProperty(labelNumber)) {
                   _itemLabel = that._options.labels[labelNumber];
                 } else {
                   _itemLabel = labelNumber + 1;
@@ -3966,7 +3950,7 @@
     }
   };
 
-  coreuiChart.type.hBar = {
+  var TypeHBar = {
     _options: {},
     _apexOptions: {},
     _apex: null,
@@ -3988,7 +3972,7 @@
      */
     render: function render(container) {
       this._buildApexOptions();
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.debug) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.debug) {
         console.log($.extend(true, {}, this._apexOptions));
       }
       this._apex = new _t(container, this._apexOptions);
@@ -4004,7 +3988,7 @@
       this._apexOptions.plotOptions.bar.horizontal = true;
 
       // Styles
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && coreuiChartUtils.isObject(this._options.options.style)) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && ChartUtils.isObject(this._options.options.style)) {
         style = this._options.options.style;
         if (style.hasOwnProperty('stacked') && ['string', 'boolean'].indexOf(_typeof(style.stacked)) >= 0) {
           if (style.stacked === true) {
@@ -4040,10 +4024,10 @@
       }
 
       // Datasets
-      if (this._options.hasOwnProperty('datasets') && coreuiChartUtils.isArray(this._options.datasets)) {
+      if (this._options.hasOwnProperty('datasets') && ChartUtils.isArray(this._options.datasets)) {
         var datasetNum = 0;
         $.each(this._options.datasets, function (key, dataset) {
-          if (!coreuiChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || !dataset.hasOwnProperty('name') || typeof dataset.type !== 'string' || typeof dataset.name !== 'string') {
+          if (!ChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || !dataset.hasOwnProperty('name') || typeof dataset.type !== 'string' || typeof dataset.name !== 'string') {
             return;
           }
           if (['bar'].indexOf(dataset.type) >= 0) {
@@ -4092,7 +4076,7 @@
             }
 
             // Dataset style
-            if (dataset.hasOwnProperty('style') && coreuiChartUtils.isObject(dataset.style)) {
+            if (dataset.hasOwnProperty('style') && ChartUtils.isObject(dataset.style)) {
               if (dataset.style.hasOwnProperty('color') && typeof dataset.style.color === 'string') {
                 color = dataset.style.color;
               }
@@ -4153,7 +4137,7 @@
     }
   };
 
-  coreuiChart.type.radar = {
+  var TypeRadar = {
     _options: {},
     _apexOptions: {},
     _apex: null,
@@ -4175,7 +4159,7 @@
      */
     render: function render(container) {
       this._buildApexOptions();
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.debug) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.debug) {
         console.log($.extend(true, {}, this._apexOptions));
       }
       this._apex = new _t(container, this._apexOptions);
@@ -4194,15 +4178,15 @@
       this._apexOptions.xaxis.crosshairs.show = false;
 
       // Styles
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && coreuiChartUtils.isObject(this._options.options.style)) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && ChartUtils.isObject(this._options.options.style)) {
         style = this._options.options.style;
       }
 
       // Datasets
-      if (this._options.hasOwnProperty('datasets') && coreuiChartUtils.isArray(this._options.datasets)) {
+      if (this._options.hasOwnProperty('datasets') && ChartUtils.isArray(this._options.datasets)) {
         var datasetNum = 0;
         $.each(this._options.datasets, function (key, dataset) {
-          if (!coreuiChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || typeof dataset.type !== 'string' || !dataset.hasOwnProperty('name') || typeof dataset.name !== 'string') {
+          if (!ChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || typeof dataset.type !== 'string' || !dataset.hasOwnProperty('name') || typeof dataset.name !== 'string') {
             return;
           }
           if (['radar'].indexOf(dataset.type) >= 0) {
@@ -4241,7 +4225,7 @@
             }
 
             // Dataset style
-            if (dataset.hasOwnProperty('style') && coreuiChartUtils.isObject(dataset.style)) {
+            if (dataset.hasOwnProperty('style') && ChartUtils.isObject(dataset.style)) {
               if (dataset.style.hasOwnProperty('color') && typeof dataset.style.color === 'string') {
                 color = dataset.style.color;
               }
@@ -4314,7 +4298,7 @@
     }
   };
 
-  coreuiChart.type.candlestick = {
+  var TypeCandlestick = {
     _options: {},
     _apexOptions: {},
     _apex: null,
@@ -4336,7 +4320,7 @@
      */
     render: function render(container) {
       this._buildApexOptions();
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.debug) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.debug) {
         console.log($.extend(true, {}, this._apexOptions));
       }
       this._apex = new _t(container, this._apexOptions);
@@ -4354,7 +4338,7 @@
       this._apexOptions.xaxis.crosshairs.show = false;
 
       // Styles
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && coreuiChartUtils.isObject(this._options.options.style)) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && ChartUtils.isObject(this._options.options.style)) {
         style = this._options.options.style;
         if (style.hasOwnProperty('colorUpward') && typeof style.colorUpward === 'string') {
           this._apexOptions.plotOptions.candlestick.colors.upward = style.colorUpward;
@@ -4365,10 +4349,10 @@
       }
 
       // Datasets
-      if (this._options.hasOwnProperty('datasets') && coreuiChartUtils.isArray(this._options.datasets)) {
+      if (this._options.hasOwnProperty('datasets') && ChartUtils.isArray(this._options.datasets)) {
         var datasetNum = 0;
         $.each(this._options.datasets, function (key, dataset) {
-          if (!coreuiChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || !dataset.hasOwnProperty('name') || typeof dataset.type !== 'string' || typeof dataset.name !== 'string') {
+          if (!ChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || !dataset.hasOwnProperty('name') || typeof dataset.type !== 'string' || typeof dataset.name !== 'string') {
             return;
           }
           if (['candlestick'].indexOf(dataset.type) >= 0) {
@@ -4411,7 +4395,7 @@
             }
 
             // Dataset style
-            if (dataset.hasOwnProperty('style') && coreuiChartUtils.isObject(dataset.style)) {
+            if (dataset.hasOwnProperty('style') && ChartUtils.isObject(dataset.style)) {
               if (dataset.style.hasOwnProperty('color') && typeof dataset.style.color === 'string') {
                 color = dataset.style.color;
               }
@@ -4440,11 +4424,11 @@
             }
             var labelNumber = 0;
             $.each(dataset.data, function (key, item) {
-              if (coreuiChartUtils.isObject(item) && item.hasOwnProperty('y')) {
+              if (ChartUtils.isObject(item) && item.hasOwnProperty('y')) {
                 var itemLabel = '';
                 if (item.hasOwnProperty('x')) {
                   itemLabel = item.x;
-                } else if (that._options.hasOwnProperty('labels') && coreuiChartUtils.isArray(that._options.labels) && that._options.labels.hasOwnProperty(labelNumber)) {
+                } else if (that._options.hasOwnProperty('labels') && ChartUtils.isArray(that._options.labels) && that._options.labels.hasOwnProperty(labelNumber)) {
                   itemLabel = that._options.labels[labelNumber];
                 } else {
                   itemLabel = labelNumber + 1;
@@ -4497,7 +4481,7 @@
     }
   };
 
-  coreuiChart.type.polarArea = {
+  var TypePolarArea = {
     _options: {},
     _apexOptions: {},
     _apex: null,
@@ -4519,7 +4503,7 @@
      */
     render: function render(container) {
       this._buildApexOptions();
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.debug) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.debug) {
         console.log($.extend(true, {}, this._apexOptions));
       }
       this._apex = new _t(container, this._apexOptions);
@@ -4535,7 +4519,7 @@
       this._apexOptions.fill.opacity = 0.7;
 
       // Styles
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && coreuiChartUtils.isObject(this._options.options.style)) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && ChartUtils.isObject(this._options.options.style)) {
         var style = this._options.options.style;
         if (style.hasOwnProperty('fill') && typeof style.fill === 'number') {
           if (style.fill < 1) {
@@ -4554,9 +4538,9 @@
       }
 
       // Datasets
-      if (this._options.hasOwnProperty('datasets') && coreuiChartUtils.isArray(this._options.datasets)) {
+      if (this._options.hasOwnProperty('datasets') && ChartUtils.isArray(this._options.datasets)) {
         $.each(this._options.datasets, function (key, dataset) {
-          if (!coreuiChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || typeof dataset.type !== 'string') {
+          if (!ChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || typeof dataset.type !== 'string') {
             return;
           }
           if (['polarArea'].indexOf(dataset.type) >= 0) {
@@ -4569,7 +4553,7 @@
     }
   };
 
-  coreuiChart.type.rangeArea = {
+  var TypeRangeArea = {
     _options: {},
     _apexOptions: {},
     _apex: null,
@@ -4591,7 +4575,7 @@
      */
     render: function render(container) {
       this._buildApexOptions();
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.debug) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.debug) {
         console.log($.extend(true, {}, this._apexOptions));
       }
       this._apex = new _t(container, this._apexOptions);
@@ -4606,7 +4590,7 @@
       this._apexOptions.chart.type = 'rangeArea';
 
       // Styles
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && coreuiChartUtils.isObject(this._options.options.style)) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && ChartUtils.isObject(this._options.options.style)) {
         style = this._options.options.style;
         if (style.hasOwnProperty('markerType') && typeof style.markerType === 'string') {
           this._apexOptions.markers.shape = style.markerType;
@@ -4614,10 +4598,10 @@
       }
 
       // Datasets
-      if (this._options.hasOwnProperty('datasets') && coreuiChartUtils.isArray(this._options.datasets)) {
+      if (this._options.hasOwnProperty('datasets') && ChartUtils.isArray(this._options.datasets)) {
         var datasetNum = 0;
         $.each(this._options.datasets, function (key, dataset) {
-          if (!coreuiChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || !dataset.hasOwnProperty('name') || typeof dataset.type !== 'string' || typeof dataset.name !== 'string') {
+          if (!ChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || !dataset.hasOwnProperty('name') || typeof dataset.type !== 'string' || typeof dataset.name !== 'string') {
             return;
           }
           if (['line', 'rangeArea'].indexOf(dataset.type) >= 0) {
@@ -4679,7 +4663,7 @@
             }
 
             // Dataset style
-            if (dataset.hasOwnProperty('style') && coreuiChartUtils.isObject(dataset.style)) {
+            if (dataset.hasOwnProperty('style') && ChartUtils.isObject(dataset.style)) {
               if (dataset.style.hasOwnProperty('color') && typeof dataset.style.color === 'string') {
                 color = dataset.style.color;
               }
@@ -4730,9 +4714,9 @@
             }
             var labelNumber = 0;
             $.each(dataset.data, function (key, item) {
-              if (coreuiChartUtils.isArray(item) || ['number', 'string'].indexOf(_typeof(item)) >= 0) {
+              if (ChartUtils.isArray(item) || ['number', 'string'].indexOf(_typeof(item)) >= 0) {
                 var itemLabel = labelNumber + 1;
-                if (that._options.hasOwnProperty('labels') && coreuiChartUtils.isArray(that._options.labels) && that._options.labels.hasOwnProperty(labelNumber)) {
+                if (that._options.hasOwnProperty('labels') && ChartUtils.isArray(that._options.labels) && that._options.labels.hasOwnProperty(labelNumber)) {
                   itemLabel = that._options.labels[labelNumber];
                 }
                 data.push({
@@ -4787,7 +4771,7 @@
     }
   };
 
-  coreuiChart.type.rangeBar = {
+  var TypeRangeBar = {
     _options: {},
     _apexOptions: {},
     _apex: null,
@@ -4809,7 +4793,7 @@
      */
     render: function render(container) {
       this._buildApexOptions();
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.debug) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.debug) {
         console.log($.extend(true, {}, this._apexOptions));
       }
       this._apex = new _t(container, this._apexOptions);
@@ -4827,7 +4811,7 @@
       this._apexOptions.plotOptions.bar.horizontal = false;
 
       // Styles
-      if (this._options.hasOwnProperty('options') && coreuiChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && coreuiChartUtils.isObject(this._options.options.style)) {
+      if (this._options.hasOwnProperty('options') && ChartUtils.isObject(this._options.options) && this._options.options.hasOwnProperty('style') && ChartUtils.isObject(this._options.options.style)) {
         style = this._options.options.style;
         if (style.hasOwnProperty('horizontal') && style.horizontal === true) {
           this._apexOptions.plotOptions.bar.horizontal = true;
@@ -4852,10 +4836,10 @@
       }
 
       // Datasets
-      if (this._options.hasOwnProperty('datasets') && coreuiChartUtils.isArray(this._options.datasets)) {
+      if (this._options.hasOwnProperty('datasets') && ChartUtils.isArray(this._options.datasets)) {
         var datasetNum = 0;
         $.each(this._options.datasets, function (key, dataset) {
-          if (!coreuiChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || !dataset.hasOwnProperty('name') || typeof dataset.type !== 'string' || typeof dataset.name !== 'string') {
+          if (!ChartUtils.isObject(dataset) || !dataset.hasOwnProperty('type') || !dataset.hasOwnProperty('name') || typeof dataset.type !== 'string' || typeof dataset.name !== 'string') {
             return;
           }
           if (['bar'].indexOf(dataset.type) >= 0) {
@@ -4902,7 +4886,7 @@
             }
 
             // Dataset style
-            if (dataset.hasOwnProperty('style') && coreuiChartUtils.isObject(dataset.style)) {
+            if (dataset.hasOwnProperty('style') && ChartUtils.isObject(dataset.style)) {
               if (dataset.style.hasOwnProperty('color') && typeof dataset.style.color === 'string') {
                 color = dataset.style.color;
               }
@@ -4942,9 +4926,9 @@
             }
             var labelNumber = 0;
             $.each(dataset.data, function (key, item) {
-              if (coreuiChartUtils.isArray(item)) {
+              if (ChartUtils.isArray(item)) {
                 var itemLabel = labelNumber + 1;
-                if (that._options.hasOwnProperty('labels') && coreuiChartUtils.isArray(that._options.labels) && that._options.labels.hasOwnProperty(labelNumber)) {
+                if (that._options.hasOwnProperty('labels') && ChartUtils.isArray(that._options.labels) && that._options.labels.hasOwnProperty(labelNumber)) {
                   itemLabel = that._options.labels[labelNumber];
                 }
                 data.push({
@@ -4992,7 +4976,7 @@
     }
   };
 
-  coreuiChart.lang.en = {
+  var langEn = {
     loading: 'Loading',
     months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     shortMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -5012,7 +4996,7 @@
     }
   };
 
-  coreuiChart.lang.ru = {
+  var langRu = {
     loading: 'Загрузка',
     months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
     shortMonths: ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"],
@@ -5032,6 +5016,18 @@
     }
   };
 
-  return coreuiChart;
+  Chart$1.type.pie = TypePie;
+  Chart$1.type.line = TypeLine;
+  Chart$1.type.box = TypeBox;
+  Chart$1.type.hBar = TypeHBar;
+  Chart$1.type.radar = TypeRadar;
+  Chart$1.type.candlestick = TypeCandlestick;
+  Chart$1.type.polarArea = TypePolarArea;
+  Chart$1.type.rangeArea = TypeRangeArea;
+  Chart$1.type.rangeBar = TypeRangeBar;
+  Chart$1.type.en = langEn;
+  Chart$1.type.ru = langRu;
+
+  return Chart$1;
 
 }));

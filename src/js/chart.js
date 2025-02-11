@@ -1,8 +1,8 @@
 
-import coreuiChartInstance from './coreui.chart.instance';
-import coreuiChartUtils    from './coreui.chart.utils';
+import ChartInstance from './chart.instance';
+import ChartUtils    from './chart.utils';
 
-let coreuiChart = {
+let Chart = {
 
     lang: {},
     type: {},
@@ -16,21 +16,20 @@ let coreuiChart = {
     /**
      * Создание экземпляра формы
      * @param {object} options
-     * @returns {CoreUI.chart.instance}
+     * @returns {ChartInstance}
      */
     create: function (options) {
-        let instance = $.extend(true, {}, coreuiChartInstance);
 
         if ( ! options.hasOwnProperty('lang')) {
-            options.lang = coreuiChart.getSetting('lang');
+            options.lang = Chart.getSetting('lang');
         }
 
         let langList     = this.lang.hasOwnProperty(options.lang) ? this.lang[options.lang] : {};
-        options.langList = options.hasOwnProperty('langList') && coreuiChartUtils.isObject(options.langList)
+        options.langList = options.hasOwnProperty('langList') && ChartUtils.isObject(options.langList)
             ? $.extend(true, {}, langList, options.langList)
             : langList;
 
-        instance._init(this, options instanceof Object ? options : {});
+        let instance = new ChartInstance(this, options instanceof Object ? options : {});
 
         let chartId = instance.getId();
         this._instances[chartId] = instance;
@@ -42,7 +41,7 @@ let coreuiChart = {
     /**
      * Получение экземпляра формы по id
      * @param {string} id
-     * @returns {CoreUI.chart.instance|null}
+     * @returns {ChartInstance|null}
      */
     get: function (id) {
 
@@ -86,4 +85,4 @@ let coreuiChart = {
 }
 
 
-export default coreuiChart;
+export default Chart;

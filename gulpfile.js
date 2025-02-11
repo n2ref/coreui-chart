@@ -17,13 +17,13 @@ var conf = {
     js: {
         fileMin: 'coreui-chart.min.js',
         file: 'coreui-chart.js',
-        main: 'src/js/main.js',
+        main: 'src/main.js',
         src: 'src/js/**/*.js'
     },
     css: {
         fileMin: 'coreui-chart.min.css',
         file: 'coreui-chart.css',
-        main: 'src/css/coreui.chart.scss',
+        main: 'src/main.scss',
         src: [
             'src/css/*.scss',
         ]
@@ -75,7 +75,11 @@ gulp.task('build_js_min', function() {
         .pipe(source(conf.js.fileMin))
         .pipe(buffer())
         .pipe(sourcemaps.init())
-        .pipe(uglify())
+        .pipe(uglify({
+            mangle: {
+                reserved: ['ChartInstance']
+            }
+        }))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(conf.dist));
 });

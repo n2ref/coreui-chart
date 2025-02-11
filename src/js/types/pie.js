@@ -1,9 +1,8 @@
 
-import coreuiChart      from '../coreui.chart';
-import coreuiChartUtils from '../coreui.chart.utils';
-import apexCharts       from 'apexcharts/dist/apexcharts.esm';
+import ChartUtils from '../chart.utils';
+import ApexCharts from 'apexcharts/dist/apexcharts.esm';
 
-coreuiChart.type.pie = {
+let TypePie = {
 
     _options: {},
     _apexOptions: {},
@@ -34,13 +33,13 @@ coreuiChart.type.pie = {
         this._buildApexOptions();
 
         if (this._options.hasOwnProperty('options') &&
-            coreuiChartUtils.isObject(this._options.options) &&
+            ChartUtils.isObject(this._options.options) &&
             this._options.options.debug
         ) {
             console.log($.extend(true, {}, this._apexOptions));
         }
 
-        this._apex = new apexCharts(container, this._apexOptions);
+        this._apex = new ApexCharts(container, this._apexOptions);
         this._apex.render();
     },
 
@@ -64,18 +63,18 @@ coreuiChart.type.pie = {
 
         // Styles
         if (this._options.hasOwnProperty('options') &&
-            coreuiChartUtils.isObject(this._options.options) &&
+            ChartUtils.isObject(this._options.options) &&
             this._options.options.hasOwnProperty('style') &&
-            coreuiChartUtils.isObject(this._options.options.style)
+            ChartUtils.isObject(this._options.options.style)
         ) {
             style = this._options.options.style;
         }
 
 
         // Datasets
-        if (this._options.hasOwnProperty('datasets') && coreuiChartUtils.isArray(this._options.datasets)) {
+        if (this._options.hasOwnProperty('datasets') && ChartUtils.isArray(this._options.datasets)) {
             $.each(this._options.datasets, function (key, dataset) {
-                if ( ! coreuiChartUtils.isObject(dataset) ||
+                if ( ! ChartUtils.isObject(dataset) ||
                      ! dataset.hasOwnProperty('type') ||
                      typeof dataset.type !== 'string'
                 ) {
@@ -195,7 +194,7 @@ coreuiChart.type.pie = {
                         };
 
                     } else if (typeof style.total.formatter === 'string') {
-                        let func = coreuiChartUtils.getFunctionByName(style.total.formatter);
+                        let func = ChartUtils.getFunctionByName(style.total.formatter);
 
                         if (typeof func === 'function') {
                             this._apexOptions.plotOptions.pie.donut.labels.total.formatter = function (w) {
@@ -236,7 +235,7 @@ coreuiChart.type.pie = {
                         };
 
                     } else if (typeof style.total.formatter === 'string') {
-                        let func = coreuiChartUtils.getFunctionByName(style.total.formatter);
+                        let func = ChartUtils.getFunctionByName(style.total.formatter);
 
                         if (typeof func === 'function') {
                             this._apexOptions.plotOptions.radialBar.dataLabels.total.formatter = function (w) {
@@ -265,3 +264,5 @@ coreuiChart.type.pie = {
         this._apexOptions.dataLabels.style.colors = [labelColor];
     }
 }
+
+export default TypePie;
